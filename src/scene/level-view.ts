@@ -140,8 +140,8 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
   root.add(launcherRig);
   if (lh > 0) {
     // A lifeguard-tower platform at exactly the launcher height.
-    const deck = box(2.2, 0.2, 2.2, '#f4f4f4');
-    deck.position.set(lx - 0.9, lh - 0.1, -0.4);
+    const deck = box(2.0, 0.18, 1.8, '#c98b52');
+    deck.position.set(lx - 0.9, lh - 0.09, -0.3);
     launcherRig.add(deck);
     for (const [dx, dz] of [[-1.9, -1.4], [0.1, -1.4], [-1.9, 0.6], [0.1, 0.6]]) {
       const leg = box(0.16, lh - 0.2, 0.16, '#e84a4a');
@@ -151,7 +151,7 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
     const rail = box(2.2, 0.08, 0.08, '#e84a4a');
     rail.position.set(lx - 0.9, lh + 0.9, -1.45);
     launcherRig.add(rail);
-    const ladder = box(0.6, lh, 0.08, '#ffffff');
+    const ladder = box(0.5, lh, 0.08, '#e84a4a');
     ladder.position.set(lx - 2.3, lh / 2, 0.4);
     ladder.rotation.z = 0.25;
     launcherRig.add(ladder);

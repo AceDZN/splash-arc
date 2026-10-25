@@ -5,3 +5,4 @@ playwright-report
 output
 .DS_Store
 *.log
+assets-src

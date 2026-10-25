@@ -101,10 +101,10 @@ export class Stage {
 
     // Sand.
     const sandTex = noiseTexture('#f2d7a0', ['#e2c084', '#fbe7bf', '#d9b27a']);
-    sandTex.repeat.set(30, 16);
-    const sand = new THREE.Mesh(new THREE.PlaneGeometry(140, 60), toon('#ffffff', { map: sandTex }));
+    sandTex.repeat.set(30, 30);
+    const sand = new THREE.Mesh(new THREE.PlaneGeometry(160, 130), toon('#ffffff', { map: sandTex }));
     sand.rotation.x = -Math.PI / 2;
-    sand.position.set(6, 0, -8);
+    sand.position.set(6, 0, 20);
     sand.receiveShadow = true;
     this.scene.add(sand);
 
@@ -257,8 +257,9 @@ export class Stage {
     this.camera.aspect = aspect;
     const portrait = aspect < 1;
     // The HUD covers the top and bottom bands; keep the field in the middle.
-    const topFrac = portrait ? 0.24 : 0.15;
-    const botFrac = portrait ? 0.17 : 0.12;
+    const short = !portrait && h < 520;
+    const topFrac = portrait ? 0.4 : short ? 0.24 : 0.15;
+    const botFrac = portrait ? 0.16 : short ? 0.2 : 0.18;
     const { x0, x1, y0, y1 } = this.view;
     const W = x1 - x0;
     const H = (y1 - y0) / (1 - topFrac - botFrac);

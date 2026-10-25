@@ -232,6 +232,6 @@ export const LEVELS: Level[] = [
     help: { preview: 'none', landing: false, axis: false, gridLabels: false },
     hint: [],
     theme: 'night',
-    modules: ['vertex-form', 'factored-form', 'quadratic-positive-negative'],
+    modules: ['vertex-form', 'factored-form', 'quadratic-positive-negative-intervals'],
   },
 ];

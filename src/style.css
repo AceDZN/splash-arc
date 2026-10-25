@@ -64,17 +64,23 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
 
 /* ---- Bottom bar ---- */
 .bottom { position: absolute; left: 12px; right: 12px; bottom: max(10px, env(safe-area-inset-bottom)); display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.fire { order: 3; width: 112px; height: 112px; border-radius: 50%; color: #fff; font-size: 30px; font-weight: 800; background: radial-gradient(circle at 35% 30%, #ffb15c, var(--orange) 60%, #e0520a); box-shadow: 0 7px 0 #a83a00, 0 0 0 6px rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; text-shadow: 0 2px 0 rgba(0,0,0,0.25); transition: transform 0.1s, filter 0.2s; }
+.fire { order: 1; flex-shrink: 0; width: 112px; height: 112px; border-radius: 50%; color: #fff; font-size: 30px; font-weight: 800; background: radial-gradient(circle at 35% 30%, #ffb15c, var(--orange) 60%, #e0520a); box-shadow: 0 7px 0 #a83a00, 0 0 0 6px rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; text-shadow: 0 2px 0 rgba(0,0,0,0.25); transition: transform 0.1s, filter 0.2s; }
 .fire:active { transform: translateY(4px); box-shadow: 0 3px 0 #a83a00; }
 .fire:disabled { filter: grayscale(0.7) brightness(0.9); cursor: default; }
 .fire-ico { font-size: 22px; }
 .nudge { order: 2; display: flex; gap: 10px; align-items: center; padding: 10px 14px; border-radius: 999px; background: rgba(255,250,240,0.95); box-shadow: 0 5px 0 rgba(0,0,0,0.15); }
 .nudge-row { display: flex; align-items: center; gap: 8px; direction: ltr; }
-.nbtn { width: 52px; height: 52px; border-radius: 14px; font-size: 30px; font-weight: 800; color: #fff; background: var(--teal); box-shadow: 0 4px 0 #128079; }
-.nlabel { min-width: 110px; text-align: center; font-size: 20px; font-weight: 600; }
+.ngroup { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 2px 6px; border-radius: 16px; }
+.ngroup.sel { background: rgba(0,0,0,0.05); }
+.ngroup[hidden] { display: none; }
+.nname { font-size: 12px; font-weight: 700; color: #6a6f80; }
+.nbtn { width: 50px; height: 50px; border-radius: 14px; font-size: 30px; font-weight: 800; color: #fff; }
+.g-k .nbtn { background: var(--yellow); color: #3a2a00; box-shadow: 0 4px 0 #c99410; }
+.g-p .nbtn { background: var(--teal); box-shadow: 0 4px 0 #128079; }
+.nlabel { min-width: 84px; text-align: center; font-size: 20px; font-weight: 600; }
 .fine { padding: 8px 12px; border-radius: 999px; font-size: 14px; font-weight: 700; background: #e9e4f7; color: #4b3f9e; }
 .fine.on { background: #4b3f9e; color: #fff; }
-.hint-btn { order: 1; padding: 12px 18px; border-radius: 999px; font-size: 18px; font-weight: 800; background: #fff3c4; color: #6b4a00; box-shadow: 0 4px 0 #d9b44a; }
+.hint-btn { order: 3; padding: 12px 18px; border-radius: 999px; font-size: 18px; font-weight: 800; background: #fff3c4; color: #6b4a00; box-shadow: 0 4px 0 #d9b44a; }
 #hud.busy .nudge { opacity: 0.55; }
 
 /* ---- Overlays ---- */
@@ -102,7 +108,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
 .small { font-size: 13px; color: #6a6f80; }
 
 /* ---- Narrow screens ---- */
-@media (max-width: 820px) {
+@media (max-width: 820px) and (orientation: portrait) {
   .top { grid-template-columns: 1fr auto; grid-template-areas: 'lvl sys' 'eq eq'; gap: 6px; }
   .lvl { grid-area: lvl; }
   .sys { grid-area: sys; }
@@ -115,9 +121,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
   .icon-btn { width: 40px; height: 40px; }
   .wet-txt { font-size: 15px; }
   .fire { width: 84px; height: 84px; font-size: 22px; }
-  .nbtn { width: 44px; height: 44px; font-size: 24px; }
-  .nlabel { min-width: 80px; font-size: 16px; }
-  .nudge { padding: 6px 8px; gap: 6px; flex-direction: column; border-radius: 18px; }
+  .nbtn { width: 40px; height: 40px; font-size: 22px; }
+  .nudge { padding: 6px 8px; gap: 4px; border-radius: 18px; }
+  .nname { display: none; }
+  .nlabel { min-width: 58px; font-size: 14px; }
+  .fine { padding: 6px 8px; font-size: 12px; }
   .hint-btn { padding: 10px 12px; font-size: 15px; }
   .toast { font-size: 15px; top: 38%; }
   .logo-he { font-size: 44px; }
@@ -125,12 +133,46 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .mission { display: none; }
-  .eq { font-size: 24px; }
-  .eq-card { padding: 4px 10px; }
+  .eq { font-size: 21px; }
+  .eq-title { display: none; }
+  .eq-card { padding: 4px 10px; min-width: 0; }
+  .chip { font-size: 11px; padding: 2px 6px; }
+  .lvl-chip { font-size: 14px; padding: 5px 10px; }
+  .balloons { font-size: 15px; }
+  .icon-btn { width: 38px; height: 38px; }
+  .wet { padding: 2px 10px; }
+  .wet-txt { font-size: 14px; }
+  .nname { display: none; }
+  .nbtn { width: 40px; height: 40px; font-size: 22px; }
+  .nlabel { min-width: 60px; font-size: 15px; }
+  .nudge { padding: 6px 10px; }
+  .hint-btn { padding: 8px 12px; font-size: 14px; }
+  .toast { font-size: 14px; top: 30%; }
   .fire { width: 78px; height: 78px; font-size: 20px; }
-  .nudge { flex-direction: row; }
   .nbtn { width: 40px; height: 40px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .toast, .bubble, .eq .tile { transition: none; }
 }
+
+@media (max-width: 560px) {
+  .bottom { flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+  .nudge { order: 2; flex: 1 1 auto; flex-wrap: wrap; justify-content: center; border-radius: 18px; }
+  .ngroup { padding: 0; }
+  .hint-btn { position: absolute; bottom: calc(100% + 8px); left: 0; }
+  .fire { width: 76px; height: 76px; font-size: 19px; }
+  .lvl-chip { font-size: 13px; white-space: nowrap; }
+  .lvl-num::after { margin-inline-start: 4px; }
+  .mission { font-size: 12px; line-height: 1.35; }
+  .balloons { font-size: 14px; }
+  .wet { padding: 2px 8px; }
+  .wet-txt { font-size: 13px; }
+  .icon-btn { width: 36px; height: 36px; font-size: 14px; }
+  .eq { font-size: 22px; }
+  .chip { font-size: 11px; padding: 2px 6px; }
+  .toast { top: 46%; font-size: 14px; }
+  .bubble { bottom: 150px; left: 12px; right: 12px; max-width: none; }
+}
+
+.rotate-tip { display: none; font-size: 14px; font-weight: 600; color: #4b3f9e; background: #eeeaff; border-radius: 12px; padding: 6px 10px; }
+@media (orientation: portrait) and (max-width: 700px) { .rotate-tip { display: block; } }

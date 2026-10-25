@@ -61,10 +61,21 @@ export class Hud {
       <footer class="bottom">
         <button class="fire" data-a="fire"><span class="fire-ico" aria-hidden="true">🎈</span><span class="fire-txt">שגר!</span></button>
         <div class="nudge">
-          <div class="nudge-row">
-            <button class="nbtn" data-a="minus" aria-label="הקטנה">−</button>
-            <div class="nlabel" dir="ltr"></div>
-            <button class="nbtn" data-a="plus" aria-label="הגדלה">+</button>
+          <div class="ngroup g-k">
+            <span class="nname">גובה הקדקוד</span>
+            <div class="nudge-row">
+              <button class="nbtn" data-a="k-minus" aria-label="k קטן יותר">−</button>
+              <div class="nlabel nk" dir="ltr"></div>
+              <button class="nbtn" data-a="k-plus" aria-label="k גדול יותר">+</button>
+            </div>
+          </div>
+          <div class="ngroup g-p">
+            <span class="nname">מיקום הקדקוד</span>
+            <div class="nudge-row">
+              <button class="nbtn" data-a="p-minus" aria-label="p קטן יותר">−</button>
+              <div class="nlabel np" dir="ltr"></div>
+              <button class="nbtn" data-a="p-plus" aria-label="p גדול יותר">+</button>
+            </div>
           </div>
           <button class="fine" data-a="fine" aria-pressed="false">צעד עדין <bdi dir="ltr">0.1</bdi></button>
         </div>
@@ -72,7 +83,7 @@ export class Hud {
       </footer>
       <div class="overlay" hidden></div>
     `;
-    for (const k of ['lvl-num', 'lvl-name', 'mission', 'balloons', 'eq-title', 'eq', 'chips', 'wet-txt', 'toast', 'bubble', 'bubble-txt', 'fire', 'fire-txt', 'nudge', 'nlabel', 'fine', 'hint-btn', 'overlay']) {
+    for (const k of ['lvl-num', 'lvl-name', 'mission', 'balloons', 'eq-title', 'eq', 'chips', 'wet-txt', 'toast', 'bubble', 'bubble-txt', 'fire', 'fire-txt', 'nudge', 'nk', 'np', 'g-k', 'g-p', 'fine', 'hint-btn', 'overlay']) {
       this.el[k] = root.querySelector(`.${k}`)!;
     }
     root.addEventListener('click', (e) => this.onClick(e));
@@ -86,8 +97,10 @@ export class Hud {
     const catchLevel = s.level.goal.kind === 'catch';
     switch (a) {
       case 'fire': this.actions.fire(); break;
-      case 'minus': catchLevel ? this.actions.nudgeBucket(-1) : this.actions.nudge(this.selected, -1); break;
-      case 'plus': catchLevel ? this.actions.nudgeBucket(1) : this.actions.nudge(this.selected, 1); break;
+      case 'k-minus': this.selected = 'k'; this.actions.nudge('k', -1); break;
+      case 'k-plus': this.selected = 'k'; this.actions.nudge('k', 1); break;
+      case 'p-minus': this.selected = 'p'; catchLevel ? this.actions.nudgeBucket(-1) : this.actions.nudge('p', -1); break;
+      case 'p-plus': this.selected = 'p'; catchLevel ? this.actions.nudgeBucket(1) : this.actions.nudge('p', 1); break;
       case 'tile-p': this.selected = 'p'; break;
       case 'tile-k': this.selected = 'k'; break;
       case 'tile-a': this.toast('{a} נקבע מעצמו: הקשת חייבת לצאת מהמשגר. הזיזו את הקדקוד וראו איך הוא משתנה.', 3.5); break;
@@ -187,7 +200,12 @@ export class Hud {
     const busy = s.phase !== 'aim' && s.phase !== 'card';
     (this.el.fire as HTMLButtonElement).disabled = busy || s.paused;
     this.el['fire-txt'].textContent = catchLevel ? 'מוכן!' : 'שגר!';
-    this.el.nlabel.innerHTML = catchLevel ? `דלי <b>x = ${fmt(s.bucketX)}</b>` : `${this.selected} = <b>${fmt(this.selected === 'p' ? s.p : s.k)}</b>`;
+    this.el.nk.innerHTML = `k = <b>${fmt(s.k)}</b>`;
+    this.el.np.innerHTML = catchLevel ? `x = <b>${fmt(s.bucketX)}</b>` : `p = <b>${fmt(s.p)}</b>`;
+    this.el['g-k'].hidden = catchLevel;
+    this.el['g-p'].querySelector('.nname')!.textContent = catchLevel ? 'מיקום הדלי' : 'מיקום הקדקוד';
+    this.el['g-k'].classList.toggle('sel', this.selected === 'k' && !catchLevel);
+    this.el['g-p'].classList.toggle('sel', this.selected === 'p' || catchLevel);
     this.el.fine.setAttribute('aria-pressed', String(s.fine));
     this.el.fine.classList.toggle('on', s.fine);
     this.el.fine.hidden = catchLevel;
@@ -217,6 +235,7 @@ export class Hud {
         <li><span aria-hidden="true">🎈</span> <b>שגר!</b> (או רווח) — הבלון עף על הפרבולה</li>
         <li><span aria-hidden="true">⌨️</span> מקלדת: חיצים מזיזים את הקדקוד, <bdi dir="ltr">F</bdi> צעד עדין, <bdi dir="ltr">H</bdi> רמז, <bdi dir="ltr">P</bdi> השהיה</li>
       </ul>
+      <p class="rotate-tip"><span aria-hidden="true">📱↻</span> בטלפון? סובבו לרוחב בשביל מגרש גדול יותר.</p>
       <button class="big" data-a="start">יוצאים לקרב!</button>
       ${this.levelGrid()}
       <p class="small">כיתה ט׳ · פרק 4: הפונקציה הריבועית · לפי Workbook</p>

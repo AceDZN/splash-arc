@@ -2,6 +2,7 @@
 import { type Arc, horizontalSpeed, yAt } from '../math/arc';
 import type { ShotResult } from '../math/trace';
 import { LEVELS, type Level } from './levels';
+import { generateChallenge } from './generator';
 import { aimArc, catches, clampVertex, FINE_SNAP, resolveShot, SNAP, volleyArc, volleyLanding, type ShotOutcome } from './shot';
 
 export type Phase = 'aim' | 'drift' | 'flight' | 'impact' | 'card' | 'incoming' | 'won' | 'out';
@@ -73,8 +74,12 @@ export class Game {
     this.state = this.fresh(levelIndex, stars, []);
   }
 
-  private fresh(levelIndex: number, stars: number[], log: LearningEvent[]): GameState {
-    const level = LEVELS[levelIndex];
+  /** Current challenge round (0 while playing the authored levels). */
+  challengeRound = 0;
+  challengeSeed = 1;
+
+  private fresh(levelIndex: number, stars: number[], log: LearningEvent[], custom?: Level): GameState {
+    const level = custom ?? LEVELS[levelIndex];
     return {
       levelIndex,
       level,
@@ -105,12 +110,25 @@ export class Game {
 
   loadLevel(index: number): void {
     const i = Math.max(0, Math.min(LEVELS.length - 1, index));
+    this.challengeRound = 0;
     this.state = this.fresh(i, this.state.stars, this.state.log);
     this.events.push({ type: 'level', id: this.state.level.id });
   }
 
+  /** A solver-verified generated level (replay mode after the authored slice). */
+  loadChallenge(round: number, seed = this.challengeSeed): void {
+    this.challengeRound = round;
+    this.challengeSeed = seed;
+    this.state = this.fresh(LEVELS.length, this.state.stars, this.state.log, generateChallenge(seed + round, round));
+    this.events.push({ type: 'level', id: this.state.level.id });
+  }
+
   restart(): void {
-    this.loadLevel(this.state.levelIndex);
+    if (this.challengeRound > 0) {
+      const level = this.state.level;
+      this.state = this.fresh(LEVELS.length, this.state.stars, this.state.log, level);
+      this.events.push({ type: 'level', id: level.id });
+    } else this.loadLevel(this.state.levelIndex);
   }
 
   /** The arc as currently aimed (before any drift). */
@@ -322,7 +340,7 @@ export class Game {
     s.phase = 'won';
     const fails = s.level.goal.kind === 'catch' ? s.misses : s.shotsFired - 1;
     const stars = fails === 0 ? 3 : fails === 1 ? 2 : 1;
-    s.stars[s.levelIndex] = Math.max(s.stars[s.levelIndex] ?? 0, stars);
+    if (this.challengeRound === 0) s.stars[s.levelIndex] = Math.max(s.stars[s.levelIndex] ?? 0, stars);
     this.events.push({ type: 'won', stars });
   }
 }

@@ -176,3 +176,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
 
 .rotate-tip { display: none; font-size: 14px; font-weight: 600; color: #4b3f9e; background: #eeeaff; border-radius: 12px; padding: 6px 10px; }
 @media (orientation: portrait) and (max-width: 700px) { .rotate-tip { display: block; } }
+
+.panel .lv-ch { background: #eeeaff; border-color: #c9bff5; }
+.lv-ch .lv-n { color: #4b3f9e; }

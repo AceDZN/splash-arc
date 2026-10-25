@@ -125,3 +125,19 @@ test('eyeballing is not enough: one fixed vertex never wins more than one level,
     assert.ok(share < 0.06, `level ${l.id}: a random snapped vertex wins ${(share * 100).toFixed(1)}%`);
   }
 });
+
+test('generated challenges always have a solver-verified window, and "always k = 8" fails most of them', async () => {
+  const { generateChallenge } = await import('../src/game/generator');
+  let fixedWins = 0;
+  const N = 40;
+  for (let seed = 1; seed <= N; seed++) {
+    const l = generateChallenge(seed, 1);
+    const wins = winningVertices(l);
+    assert.ok(wins.length >= 1 && wins.length <= 4, `seed ${seed}: ${wins.length} answers`);
+    const T = (l.field.obstacles.find((o) => o.id === 'fort') as { x1: number; x2: number });
+    const p = (T.x1 + T.x2) / 4;
+    assert.ok(wins.every((w) => w.p === p));
+    if (resolveShot(l, p, 8).success) fixedWins++;
+  }
+  assert.ok(fixedWins / N < 0.35, `k = 8 at the right p still wins ${fixedWins}/${N}`);
+});

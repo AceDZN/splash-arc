@@ -15,6 +15,7 @@ export interface HudActions {
   restart(): void;
   next(): void;
   goLevel(i: number): void;
+  challenge(): void;
   toggleMute(): void;
   toggleMotion(): void;
   start(): void;
@@ -113,6 +114,7 @@ export class Hud {
       case 'next': this.actions.next(); break;
       case 'motion': this.actions.toggleMotion(); break;
       case 'start': this.actions.start(); break;
+      case 'challenge': this.actions.challenge(); break;
       case 'level': this.actions.goLevel(Number(t.dataset.i)); break;
     }
     this.last = '';
@@ -156,8 +158,8 @@ export class Hud {
     if (key === this.last) return;
     this.last = key;
 
-    this.el['lvl-num'].textContent = `שלב ${lv.id}/${LEVELS.length}`;
-    this.el['lvl-name'].textContent = lv.name;
+    this.el['lvl-num'].textContent = this.game.challengeRound > 0 ? `אתגר ${this.game.challengeRound}` : `שלב ${lv.id}/${LEVELS.length}`;
+    this.el['lvl-name'].textContent = this.game.challengeRound > 0 ? 'פשיטה מהירה' : lv.name;
     this.el.mission.innerHTML = richText(lv.mission);
 
     if (catchLevel) {
@@ -244,7 +246,7 @@ export class Hud {
 
   levelGrid(): string {
     const st = this.game.state.stars;
-    return `<div class="levels">${LEVELS.map((l, i) => `<button class="lv" data-a="level" data-i="${i}"><span class="lv-n">${l.id}</span><span class="lv-name">${l.name}</span><span class="lv-stars" aria-label="${st[i] ?? 0} כוכבים">${'★'.repeat(st[i] ?? 0)}${'☆'.repeat(3 - (st[i] ?? 0))}</span></button>`).join('')}</div>`;
+    return `<div class="levels">${LEVELS.map((l, i) => `<button class="lv" data-a="level" data-i="${i}"><span class="lv-n">${l.id}</span><span class="lv-name">${l.name}</span><span class="lv-stars" aria-label="${st[i] ?? 0} כוכבים">${'★'.repeat(st[i] ?? 0)}${'☆'.repeat(3 - (st[i] ?? 0))}</span></button>`).join('')}<button class="lv lv-ch" data-a="challenge"><span class="lv-n">∞</span><span class="lv-name">אתגרים</span><span class="lv-stars">מבצרים חדשים</span></button></div>`;
   }
 
   pauseScreen(): void {
@@ -263,14 +265,20 @@ export class Hud {
   }
 
   winScreen(stars: number, explain: string): void {
-    const last = this.game.state.levelIndex === LEVELS.length - 1;
+    const challenge = this.game.challengeRound > 0;
+    const last = !challenge && this.game.state.levelIndex === LEVELS.length - 1;
+    const main = challenge || last
+      ? `<button class="big" data-a="challenge">${challenge ? 'האתגר הבא' : 'אתגרים חדשים'}</button>`
+      : '<button class="big" data-a="next">לשלב הבא</button>';
     this.showOverlay(`
       <div class="stars" aria-label="${stars} כוכבים">${'★'.repeat(stars)}<span class="dim">${'★'.repeat(3 - stars)}</span></div>
       <h2>${last ? 'המבצר של המדריכים נרטב לגמרי!' : 'נרטבו!'}</h2>
       <p class="explain">${richText(explain)}</p>
+      ${last ? '<p class="small">רוצים עוד? באתגרים כל מבצר חדש: חומה וענף במקומות אחרים, ותמיד יש חלון אחד של k שעובד.</p>' : ''}
       <div class="row">
-        <button class="big" data-a="${last ? 'level' : 'next'}" data-i="0">${last ? 'מהתחלה' : 'לשלב הבא'}</button>
+        ${main}
         <button data-a="restart">שוב את השלב</button>
+        ${last || challenge ? '<button data-a="level" data-i="0">לשלב 1</button>' : ''}
       </div>
     `);
   }

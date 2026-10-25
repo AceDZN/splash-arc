@@ -233,6 +233,13 @@ function explainWin(level: Level): string {
   const arc = s.shot!.flown;
   const z = zeros(arc).map((x) => fmt(x));
   const base = `{${formatVertexForm(arc)}}: קדקוד {(${fmt(arc.p)}, ${fmt(arc.k)})}, ציר סימטרייה {x = ${fmt(arc.p)}}${z.length ? `, נקודות אפס {${z.join(', ')}}` : ''}.`;
+  if (game.challengeRound > 0) {
+    const wall = level.field.obstacles.find((o) => o.id === 'wall');
+    const branch = level.field.obstacles.find((o) => o.id === 'branch');
+    if (wall?.kind === 'post' && branch?.kind === 'post') {
+      return `${base} {y(${wall.x}) = ${fmt(yAt(arc, wall.x))} > ${wall.yHigh}} מעל החומה, {y(${branch.x}) = ${fmt(yAt(arc, branch.x))} < ${branch.yLow}} מתחת לענף.`;
+    }
+  }
   switch (level.id) {
     case 1: return `${base} ב־{x = 2} הגובה {${fmt(yAt(arc, 2))}} מעל החומה ({3}), והנחיתה ב־{2p = 8}.`;
     case 2: return `${base} הפיניאטה הייתה הקדקוד, והנחיתה סימטרית ל־{0}: {x = 10}.`;
@@ -409,7 +416,15 @@ const hud: Hud = new Hud(document.getElementById('hud')!, game, {
     persist();
     hud.pauseScreen();
   },
-  start: () => { sfx.unlock(); started = true; hud.showOverlay(null); game.loadLevel(game.state.levelIndex); },
+  start: () => { sfx.unlock(); started = true; hud.showOverlay(null); game.loadLevel(Math.min(game.state.levelIndex, LEVELS.length - 1)); },
+  challenge: () => {
+    sfx.unlock();
+    started = true;
+    hud.showOverlay(null);
+    pendingOverlay = null;
+    if (game.challengeRound === 0) game.challengeSeed = Math.floor(Math.random() * 100000);
+    game.loadChallenge(game.challengeRound + 1);
+  },
 });
 sfx.setMuted(saved.muted ?? false);
 hud.muted = sfx.muted;

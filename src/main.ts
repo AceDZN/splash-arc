@@ -46,15 +46,15 @@ const persist = () => {
 };
 
 // ---------- Characters and props ----------
-const hero = new Camper('#ff8a3d', '#f4f0e6', 1.7);
+const hero = new Camper('#ff8a3d', '#f4f0e6', 2.0);
 const rivals = [new Camper('#2ec4b6', '#1f8a80'), new Camper('#2ec4b6', '#ff5d8f')];
 stage.scene.add(hero.root, ...rivals.map((r) => r.root));
-void hero.useModel('./models/camper.glb', 1.7);
-void rivals[0].useModel('./models/rival.glb', 1.6).then(() => {
-  if (!rivals[0].usingModel) void rivals[0].useModel('./models/camper.glb', 1.6, '#2ec4b6');
+void hero.useModel('./models/camper.glb', 2.0);
+void rivals[0].useModel('./models/rival.glb', 1.9).then(() => {
+  if (!rivals[0].usingModel) void rivals[0].useModel('./models/camper.glb', 1.9, '#2ec4b6');
 });
-void rivals[1].useModel('./models/rival.glb', 1.4).then(() => {
-  if (!rivals[1].usingModel) void rivals[1].useModel('./models/camper.glb', 1.4, '#2ec4b6');
+void rivals[1].useModel('./models/rival.glb', 1.7).then(() => {
+  if (!rivals[1].usingModel) void rivals[1].useModel('./models/camper.glb', 1.7, '#2ec4b6');
 });
 
 const slingshot = new THREE.Group();
@@ -176,10 +176,10 @@ function placeCast(): void {
   } else {
     const rx = s.raftX;
     slingshot.position.set(x - 0.75 + rx, h, 0);
-    hero.root.position.set(x - 1.7 + rx, h, h > 0 ? -0.6 : 1.8);
+    hero.root.position.set(x - 1.6 + rx, h, h > 0 ? -0.6 : 2.6);
     hero.face(1);
     const spot = view!.rivalSpot;
-    rivals[0].root.position.set(spot.x, 0, 1.2);
+    rivals[0].root.position.set(spot.x, 0, 1.8);
     rivals[0].face(-1);
     rivals[1].root.position.set(spot.x + 1.1, 0, spot.z - 1.4);
     rivals[1].face(-1);
@@ -649,7 +649,7 @@ declare global {
   interface Window {
     render_game_to_text: () => string;
     advanceTime: (ms: number) => void;
-    __splash: { game: Game; stage: Stage };
+    __splash: { game: Game; stage: Stage; hero: Camper; rivals: Camper[] };
   }
 }
 let manual = false;
@@ -659,7 +659,7 @@ window.advanceTime = (ms: number) => {
   const steps = Math.max(1, Math.round(ms / (1000 / 60)));
   for (let i = 0; i < steps; i++) frame(1 / 60);
 };
-window.__splash = { game, stage };
+window.__splash = { game, stage, hero, rivals };
 
 // ---------- Boot ----------
 async function boot(): Promise<void> {

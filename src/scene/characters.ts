@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { toon } from './stage';
 
 export type Move = 'idle' | 'throw' | 'cheer' | 'soaked' | 'dodge' | 'run';
@@ -17,7 +18,7 @@ const KEYWORDS: Record<Move, string[]> = {
 };
 const LOOPING: Move[] = ['idle', 'run'];
 
-const loader = new GLTFLoader();
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 const cache = new Map<string, Promise<GLTF | null>>();
 
 export function loadModel(url: string): Promise<GLTF | null> {
@@ -134,7 +135,7 @@ export class Camper {
     this.current = move;
     this.moveTime = 0;
     if (move === 'soaked') this.wet = 1;
-    const a = this.actions.get(move) ?? (move !== 'idle' ? this.actions.get('cheer') : undefined) ?? this.actions.get('idle');
+    const a = this.actions.get(move) ?? (move === 'cheer' || move === 'dodge' ? this.actions.get('cheer') : undefined) ?? this.actions.get('idle');
     if (!a || !this.mixer) return;
     a.reset().setEffectiveWeight(1).fadeIn(0.18).play();
     if (this.current_action && this.current_action !== a) this.current_action.fadeOut(0.18);
@@ -146,12 +147,41 @@ export class Camper {
     this.inner.rotation.y = dirX > 0 ? Math.PI / 2 * (1 - towardCamera) : -Math.PI / 2 * (1 - towardCamera);
   }
 
+  /** Procedural accents on top of the Tripo clips (or in place of a missing clip). */
+  private overlay(reducedMotion: boolean): void {
+    const t = this.moveTime;
+    const amp = reducedMotion ? 0.3 : 1;
+    const g = this.inner;
+    g.position.y = 0;
+    g.rotation.x = 0;
+    g.rotation.z = 0;
+    const has = (m: Move) => this.actions.has(m);
+    switch (this.current) {
+      case 'throw':
+        if (!has('throw')) g.rotation.z = -Math.sin(Math.min(1, t * 3) * Math.PI) * 0.35 * amp;
+        if (t > 0.8 && !has('throw')) this.play('idle');
+        break;
+      case 'soaked':
+        g.rotation.z = Math.sin(t * 28) * 0.1 * amp * Math.max(0, 1 - t / 1.2);
+        g.position.y = -Math.abs(Math.sin(t * 6)) * 0.05 * amp * Math.max(0, 1 - t);
+        if (t > 1.4 && !has('soaked')) this.play('idle');
+        break;
+      case 'dodge':
+        if (!has('dodge')) g.position.y = Math.sin(Math.min(1, t * 2) * Math.PI) * 0.6 * amp;
+        break;
+      case 'cheer':
+        if (!has('cheer')) g.position.y = Math.abs(Math.sin(t * 9)) * 0.25 * amp;
+        break;
+    }
+  }
+
   update(dt: number, reducedMotion: boolean): void {
     this.time += dt;
     this.moveTime += dt;
     this.wet = Math.max(0, this.wet - dt * 0.3);
     if (this.mixer) {
       this.mixer.update(dt);
+      this.overlay(reducedMotion);
       return;
     }
     // Stand-in animation.

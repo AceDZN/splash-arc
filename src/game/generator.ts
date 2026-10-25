@@ -43,7 +43,7 @@ export function generateChallenge(seed: number, round = 1): Level {
       launcher: { x: 0, h: 0 },
       start: { p: 3, k: 4 },
       pRange: [1, 7],
-      kRange: [0.5, 14],
+      kRange: [0.5, Math.min(13, Math.ceil(Hb / fb + 1.5))],
       balloons: 3,
       field: {
         xMax: 16,

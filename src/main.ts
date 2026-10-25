@@ -356,7 +356,7 @@ function onImpact(r: ShotResult, success: boolean): void {
     physics.blast(at, 4, 7);
     stage.addShake(1);
     for (const rv of rivals) rv.play('soaked');
-    hud.toast('נרטבו! פגיעה ישירה.', 2, 'good');
+    hud.toast(level.goal.kind === 'soak' && level.goal.ids.length > 1 ? 'כל המטרות בקשת אחת!' : 'פגיעה ישירה!', 2, 'good');
     return;
   }
   // Recoverable, funny failures.

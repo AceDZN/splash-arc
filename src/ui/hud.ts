@@ -170,9 +170,10 @@ export class Hud {
     }
 
     const goalIds = lv.goal.kind === 'soak' ? lv.goal.ids : [];
+    const hit = s.phase === 'impact' || s.phase === 'won' ? (s.shot?.hits.length ?? 0) : s.phase === 'flight' ? goalIds.filter((id) => s.swiped.includes(id)).length : 0;
     this.el['wet-txt'].innerHTML = catchLevel
       ? `נתפסו <bdi dir="ltr">${s.volleyIndex}/${lv.volleys!.length}</bdi>`
-      : `רטובים <bdi dir="ltr">${s.phase === 'won' ? goalIds.length : 0}/${goalIds.length}</bdi>`;
+      : `רטובים <bdi dir="ltr">${hit}/${goalIds.length}</bdi>`;
 
     const help = lv.help;
     if (catchLevel) {

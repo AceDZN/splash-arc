@@ -1,0 +1,96 @@
+{
+  "base": "http://localhost:5212/",
+  "viewport": [
+    1672,
+    941
+  ],
+  "log": {
+    "first30": {
+      "vertex": {
+        "p": 4,
+        "k": 5
+      },
+      "a": -0.3125,
+      "equation": "y = −0.31(x − 4)² + 5",
+      "zeros": [
+        0,
+        8
+      ],
+      "fine": false,
+      "preview": "toVertex"
+    },
+    "consequence": {
+      "flownVertex": {
+        "p": 4,
+        "k": 2
+      },
+      "end": {
+        "kind": "post",
+        "x": 2,
+        "y": 1.5,
+        "id": "wall"
+      },
+      "swiped": [],
+      "hits": [],
+      "success": false
+    },
+    "returnFire": {
+      "volley": 1,
+      "of": 3,
+      "card": "y = −0.5(x − 4)² + 8",
+      "thrower": 0,
+      "bucketX": 4.5,
+      "lastCatch": false
+    },
+    "impactAim": {
+      "vertex": {
+        "p": 4,
+        "k": 8
+      },
+      "a": -0.5,
+      "equation": "y = −0.5(x − 4)² + 8",
+      "zeros": "hidden",
+      "fine": false,
+      "preview": "stub"
+    },
+    "impact": {
+      "flownVertex": {
+        "p": 4,
+        "k": 8
+      },
+      "end": {
+        "kind": "ground",
+        "x": 8,
+        "y": 0
+      },
+      "swiped": [
+        "lantern-a",
+        "lantern-b"
+      ],
+      "hits": [
+        "lantern-a",
+        "lantern-b"
+      ],
+      "success": true
+    },
+    "night": {
+      "vertex": {
+        "p": 5,
+        "k": 11
+      },
+      "a": -0.44,
+      "equation": "y = −0.44(x − 5)² + 11",
+      "zeros": "hidden",
+      "fine": false,
+      "preview": "none"
+    }
+  },
+  "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+}

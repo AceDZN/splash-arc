@@ -226,7 +226,7 @@ function explainMiss(level: Level, r: ShotResult): string {
       : `ב־{x = ${fmt(e.x)}} הקשת בגובה {y = ${fmt(e.y)}}, ו${name.the} ${name.fem ? 'מתחילה' : 'מתחיל'} בגובה {${fmt(o.yLow)}} מ׳. צריך לעבור מתחת.`;
   } else if (e.kind === 'ceiling' && o?.kind === 'ceiling') {
     text = arc.a >= 0
-      ? `${upward} היא נתקעה בדגלונים. ${raise}`
+      ? `${upward} הקשת נתקעה בדגלונים. ${raise}`
       : `הקדקוד בגובה {k = ${fmt(arc.k)}}, והדגלונים בגובה {${fmt(o.y)}}: צריך קדקוד נמוך יותר.`;
   } else if (e.kind === 'space') {
     text = `${upward || 'הבלון עף מעל המגרש!'} ${arc.a >= 0 ? raise : ''}`;

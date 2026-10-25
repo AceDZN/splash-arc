@@ -132,3 +132,23 @@ In real output, ״k > 6 / 0.8 ≈ 7.48״ and ״k < 7.5 / 0.8 ≈ 9.35״ appear, 
 | L7 | (5, 8) → wall at y = 5.12; (5, 14) → branch at 11.76; (4, 10) → lands at 8 → out screen ״נגמרו הבלונים!״; R → refilled; (5, 10) | Won, **3 stars** after 3 misses (S6) |
 
 Screenshots (scratch folder): `L1-wall-zoom.png`, `L3-bunting.png`, `L3-a-positive.png`, `L6-lantern-zoom-crop.png`, `L7-start.png`, `L7-out.png`, `L7-win.png`, `L4-miss.png`.
+
+## Resolution (crew lead, 26 Oct 2026, commit after `41c267e`)
+
+| Finding | Status | What changed |
+|---|---|---|
+| B1 return fire copyable | Fixed | A missed catch swaps in a fresh volley of the same form with a new thrower and zeros (`freshVolley` in `src/game/generator.ts`, `game.ts afterImpact`); test in `tests/game.test.ts`. |
+| B2 lanterns | Fixed | Lanterns moved to `(3, 7.5)` and `(5, 7.5)`; rings now use true perpendicular distance (`ringDistance`), lantern `r = 0.2`, smaller lantern body, halo drawn at exactly `r`; test checks neighbouring arcs pass > `r + 0.05` away. Same answer `(4, 8)`. |
+| B3 bunting advice for a > 0 | Fixed | Feedback branches on the sign of `a` and reports the vertex height when `a < 0`. |
+| S1 level 5 starts at the answer | Fixed | Flag moved to 11 (answer `p = 4.5`), level starts at `(5.5, 4)` so the pre-drift marker sits on the flag; no vertex now wins two authored levels (test asserts ≤ 1). |
+| S2 a = 0 called a parabola | Fixed | "זו כבר לא פרבולה אלא קו ישר…" for `a = 0`; "הקדקוד צריך להיות גבוה מהמשגר (k > h)". |
+| S3 grammar | Fixed | Names carry gender and a ב form (״הרשת מתחילה״, ״פגעתם בבריכה״). |
+| S4 rounding | Fixed | Halves round away from zero (−0.125 → −0.13). |
+| S5 wide walls/net | Improved | Turn reduced to 0.5 rad, most of the wall and net moved behind the shot plane, height arrows on the exact x-line. Still a 3D panel, so it has some apparent width. |
+| S6 restart wipes record | Fixed | Attempts, hints and misses persist across restarts of the same level; stars and `unaided` use them; test added. |
+| S7 win texts | Fixed | Level 1 prints `2p` from the actual `p`; level 2 says "close to the piñata" when the vertex isn't `(5, 7)`. |
+| S8 level 2 hints | Fixed | Hint 1 reasons from the zeros 0 and 10 to the axis; hint 2 concludes the vertex. |
+| S9 challenge hints | Fixed | Exact fractions (`k·21/25 < 9`), "הגובה של הקשת". |
+| S10 `(x + c)` never shown | Fixed | Level 4 has a fourth volley `y = −0.5(x + 1)(x − 7)` thrown from −1, with a hint about the sign. |
+| N1–N7, N9, N10 | Fixed | "שגרו!", wording, Workbook's "מאפסים כל גורם", ±4 root, RTL landing label and height pops, CURRICULUM fine-mode wording, "תפסתם הכול!", "האפסים לפני הסחיפה" chip, clamped volley counter. |
+| N8 `1(x − 1)²` tile | Not changed | The tile keeps showing the coefficient so the three tiles stay in place; `render_game_to_text` uses the clean form. |

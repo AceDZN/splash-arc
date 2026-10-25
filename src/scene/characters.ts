@@ -6,15 +6,17 @@ import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { toon } from './stage';
 
-export type Move = 'idle' | 'throw' | 'cheer' | 'soaked' | 'dodge' | 'run';
+export type Move = 'idle' | 'throw' | 'cheer' | 'soaked' | 'dodge' | 'run' | 'laugh' | 'frustrated';
 
 const KEYWORDS: Record<Move, string[]> = {
   idle: ['idle', 'stand', 'breath'],
-  throw: ['throw', 'attack', 'cast', 'punch', 'shoot'],
+  throw: ['pitch', 'throw', 'attack', 'cast', 'punch', 'shoot'],
   cheer: ['cheer', 'victory', 'celebrat', 'happy', 'dance', 'win', 'clap'],
   soaked: ['hit', 'react', 'hurt', 'damage', 'fall', 'stun', 'shake', 'soak'],
   dodge: ['dodge', 'jump', 'roll'],
   run: ['run', 'walk', 'jog'],
+  laugh: ['laugh'],
+  frustrated: ['frustrat', 'facepalm', 'sad'],
 };
 const LOOPING: Move[] = ['idle', 'run'];
 
@@ -135,7 +137,7 @@ export class Camper {
     this.current = move;
     this.moveTime = 0;
     if (move === 'soaked') this.wet = 1;
-    const a = this.actions.get(move) ?? (move === 'cheer' || move === 'dodge' ? this.actions.get('cheer') : undefined) ?? this.actions.get('idle');
+    const a = this.actions.get(move) ?? (move === 'laugh' ? this.actions.get('cheer') : undefined) ?? this.actions.get('idle');
     if (!a || !this.mixer) return;
     a.reset().setEffectiveWeight(1).fadeIn(0.18).play();
     if (this.current_action && this.current_action !== a) this.current_action.fadeOut(0.18);

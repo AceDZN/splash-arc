@@ -309,7 +309,7 @@ function handle(ev: GameEvent): void {
       sfx.splash(true);
       sfx.laugh();
       hero.play('soaked');
-      rivals[0].play('cheer');
+      rivals[0].play('laugh');
       const at = new THREE.Vector3(ev.x, 0.2, 0);
       fx.splash(at, '#3dd6ff', 110, 1);
       fx.wetSpot(at, 1);
@@ -367,7 +367,9 @@ function onImpact(r: ShotResult, success: boolean): void {
     return;
   }
   // Recoverable, funny failures.
-  rivals[0].play('cheer');
+  rivals[0].play('laugh');
+  rivals[1].play('laugh');
+  hero.play(r.end.kind === 'space' ? 'dodge' : 'frustrated');
   sfx.laugh();
   if (r.end.kind === 'post' || r.end.kind === 'ceiling') {
     const isNet = o?.kind === 'post' && (o.look === 'net' || o.look === 'branch');

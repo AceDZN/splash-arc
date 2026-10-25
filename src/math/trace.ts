@@ -87,6 +87,15 @@ function firstInside(arc: Arc, lo: number, hi: number, yLo: number, yHi: number)
   return null;
 }
 
+/** True (perpendicular) distance from a ring's centre to the flown part of the arc, so what you see is what counts. */
+export function ringDistance(arc: Arc, ring: Ring, xFrom: number, xTo: number): number {
+  let best = Infinity;
+  const lo = Math.max(xFrom, ring.x - 1.5);
+  const hi = Math.min(xTo, ring.x + 1.5);
+  for (let x = lo; x <= hi; x += 0.002) best = Math.min(best, Math.hypot(x - ring.x, yAt(arc, x) - ring.y));
+  return best;
+}
+
 export function traceShot(arc: Arc, field: Field, withPath = true): ShotResult {
   type Hit = { x: number; kind: EndKind; id?: string };
   const hits: Hit[] = [];
@@ -123,7 +132,7 @@ export function traceShot(arc: Arc, field: Field, withPath = true): ShotResult {
   const endY = end.kind === 'ground' || end.kind === 'water' ? 0 : yAt(arc, end.x);
 
   const swiped = field.obstacles
-    .filter((o): o is Ring => o.kind === 'ring' && o.x > arc.x0 && o.x <= end.x && Math.abs(yAt(arc, o.x) - o.y) <= o.r)
+    .filter((o): o is Ring => o.kind === 'ring' && o.x > arc.x0 && o.x <= end.x && ringDistance(arc, o, arc.x0, end.x) <= o.r)
     .sort((a, b) => a.x - b.x)
     .map((o) => o.id);
 

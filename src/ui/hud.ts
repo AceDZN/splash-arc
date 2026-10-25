@@ -60,7 +60,7 @@ export class Hud {
       <div class="toast" role="status" aria-live="assertive"></div>
       <div class="bubble" role="note"><div class="bubble-who">המדריכה נועה</div><div class="bubble-txt"></div></div>
       <footer class="bottom">
-        <button class="fire" data-a="fire"><span class="fire-ico" aria-hidden="true">🎈</span><span class="fire-txt">שגר!</span></button>
+        <button class="fire" data-a="fire"><span class="fire-ico" aria-hidden="true">🎈</span><span class="fire-txt">שגרו!</span></button>
         <div class="nudge">
           <div class="ngroup g-k">
             <span class="nname">גובה הקדקוד</span>
@@ -197,12 +197,12 @@ export class Hud {
       this.el.chips.innerHTML = `<span class="chip c-vertex">קדקוד <bdi dir="ltr">(${fmt(s.p)}, ${fmt(s.k)})</bdi></span>` +
         (help.axis ? `<span class="chip c-axis">ציר סימטרייה <bdi dir="ltr">x = ${fmt(s.p)}</bdi></span>` : '') +
         `<span class="chip c-zero">נקודות אפס <bdi dir="ltr">${zeroTxt}</bdi></span>` +
-        (lv.drift ? `<span class="chip c-drift">סחיפה <bdi dir="ltr">+${fmt(lv.drift)}</bdi> מ׳</span>` : '');
+        (lv.drift ? `<span class="chip c-drift">סחיפה <bdi dir="ltr">+${fmt(lv.drift)}</bdi> מ׳ · האפסים לפני הסחיפה</span>` : '');
     }
 
     const busy = s.phase !== 'aim' && s.phase !== 'card';
     (this.el.fire as HTMLButtonElement).disabled = busy || s.paused;
-    this.el['fire-txt'].textContent = catchLevel ? 'מוכן!' : 'שגר!';
+    this.el['fire-txt'].textContent = catchLevel ? 'מוכן!' : 'שגרו!';
     this.el.nk.innerHTML = `k = <b>${fmt(s.k)}</b>`;
     this.el.np.innerHTML = catchLevel ? `x = <b>${fmt(s.bucketX)}</b>` : `p = <b>${fmt(s.p)}</b>`;
     this.el['g-k'].hidden = catchLevel;
@@ -235,7 +235,7 @@ export class Hud {
       <p class="tag">מלחמת בלוני מים במחנה הקיץ. אל תמשכו ותנחשו: <b>גררו את הקדקוד</b> של הקשת, והבלון יעוף בדיוק על <bdi dir="ltr" class="m">y = a(x − p)² + k</bdi>.</p>
       <ul class="how">
         <li><span aria-hidden="true">👆</span> גררו את הנקודה הזוהרת (הקדקוד) או לחצו על <bdi dir="ltr" class="m">p</bdi> / <bdi dir="ltr" class="m">k</bdi> במשוואה ושנו עם − / +</li>
-        <li><span aria-hidden="true">🎈</span> <b>שגר!</b> (או רווח) — הבלון עף על הפרבולה</li>
+        <li><span aria-hidden="true">🎈</span> <b>שגרו!</b> (או רווח) — הבלון עף על הפרבולה</li>
         <li><span aria-hidden="true">⌨️</span> מקלדת: חיצים מזיזים את הקדקוד, <bdi dir="ltr">F</bdi> צעד עדין, <bdi dir="ltr">H</bdi> רמז, <bdi dir="ltr">P</bdi> השהיה</li>
       </ul>
       <p class="rotate-tip"><span aria-hidden="true">📱↻</span> בטלפון? סובבו לרוחב בשביל מגרש גדול יותר.</p>
@@ -273,7 +273,7 @@ export class Hud {
       : '<button class="big" data-a="next">לשלב הבא</button>';
     this.showOverlay(`
       <div class="stars" aria-label="${stars} כוכבים">${'★'.repeat(stars)}<span class="dim">${'★'.repeat(3 - stars)}</span></div>
-      <h2>${last ? 'המבצר של המדריכים נרטב לגמרי!' : 'נרטבו!'}</h2>
+      <h2>${last ? 'המבצר של המדריכים נרטב לגמרי!' : this.game.state.level.goal.kind === 'catch' ? 'תפסתם הכול!' : 'נרטבו!'}</h2>
       <p class="explain">${richText(explain)}</p>
       ${last ? '<p class="small">רוצים עוד? באתגרים כל מבצר חדש: חומה וענף במקומות אחרים, ותמיד יש חלון אחד של k שעובד.</p>' : ''}
       <div class="row">

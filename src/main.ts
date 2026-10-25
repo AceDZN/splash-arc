@@ -156,8 +156,8 @@ function buildCurrentLevel(): void {
   hud.selectParam('k');
   // A first-time nudge from the counselor; it disappears with the first throw.
   const intro: Record<number, string> = {
-    1: 'גררו את הנקודה הזוהרת — זה הקדקוד. שימו לב איך {k} והמשוואה משתנים, ואיפה הבלון ינחת. ואז: שגר!',
-    4: 'עכשיו הם זורקים עלינו! קראו את המשוואה, גררו את הדלי לנקודה שבה הבלון ינחת ולחצו מוכן!',
+    1: 'גררו את הנקודה הזוהרת — זה הקדקוד. שימו לב איך {k} והמשוואה משתנים, ואיפה הבלון ינחת. ואז: שגרו!',
+    4: 'עכשיו הם זורקים עלינו! קראו את המשוואה, גררו את הדלי לנקודה שבה הבלון ינחת ולחצו על ׳מוכן!׳',
   };
   hud.say(game.challengeRound === 0 ? intro[level.id] ?? null : null);
 }
@@ -192,13 +192,19 @@ function placeCast(): void {
 }
 
 // ---------- Explanations (worked feedback after a shot) ----------
-function obstacleName(id: string | undefined, level: Level): string {
+/** Hebrew name of an obstacle: with ה (״הרשת״), with ב (״ברשת״) and its gender for verbs. */
+function obstacleName(id: string | undefined, level: Level): { the: string; at: string; fem: boolean } {
   const o = level.field.obstacles.find((q) => q.id === id);
-  if (!o) return 'משהו';
-  if (o.kind === 'post') return { wall: 'החומה', net: 'הרשת', branch: 'הענף', barrier: 'המצוף' }[o.look];
-  if (o.kind === 'ceiling') return 'הדגלונים';
-  if (o.kind === 'ring') return o.look === 'pinata' ? 'הפיניאטה' : 'הפנס';
-  return { crate: 'הארגז', pool: 'הבריכה', ring: 'גלגל ההצלה', fort: 'המבצר' }[o.look];
+  const n = (the: string, at: string, fem = false) => ({ the, at, fem });
+  if (!o) return n('המטרה', 'במטרה', true);
+  if (o.kind === 'post') return { wall: n('החומה', 'בחומה', true), net: n('הרשת', 'ברשת', true), branch: n('הענף', 'בענף'), barrier: n('המצוף', 'במצוף') }[o.look];
+  if (o.kind === 'ceiling') return n('הדגלונים', 'בדגלונים');
+  if (o.kind === 'ring') return o.look === 'pinata' ? n('הפיניאטה', 'בפיניאטה', true) : n('הפנס', 'בפנס');
+  return { crate: n('הארגז', 'בארגז'), pool: n('הבריכה', 'בבריכה', true), ring: n('גלגל ההצלה', 'בגלגל ההצלה'), fort: n('המבצר', 'במבצר') }[o.look];
+}
+
+function goalRings(level: Level): string[] {
+  return level.goal.kind === 'soak' ? level.goal.ids.filter((id) => level.field.obstacles.find((o) => o.id === id)?.kind === 'ring') : [];
 }
 
 function explainMiss(level: Level, r: ShotResult): string {
@@ -207,26 +213,36 @@ function explainMiss(level: Level, r: ShotResult): string {
   const e = r.end;
   const o = level.field.obstacles.find((q) => q.id === e.id);
   let text = '';
+  const name = obstacleName(e.id, level);
+  const upward = arc.a > 0
+    ? `{a = ${fmt(arc.a)}} חיובי: הפרבולה פתוחה כלפי מעלה, והבלון עולה ולא חוזר לקרקע!`
+    : arc.a === 0
+      ? `{a = 0}: זו כבר לא פרבולה אלא קו ישר {y = ${fmt(arc.k)}}, והבלון לא יורד!`
+      : '';
+  const raise = `הקדקוד צריך להיות גבוה מהמשגר ({k > ${fmt(level.launcher.h)}}).`;
   if (e.kind === 'post' && o?.kind === 'post') {
     text = o.yLow === 0
-      ? `ב־{x = ${fmt(e.x)}} הקשת בגובה {y = ${fmt(e.y)}}, אבל ${obstacleName(e.id, level)} בגובה {${fmt(o.yHigh)}} מ׳. צריך שהקשת תהיה גבוהה יותר שם.`
-      : `ב־{x = ${fmt(e.x)}} הקשת בגובה {y = ${fmt(e.y)}}, ו${obstacleName(e.id, level)} מתחיל ב־{${fmt(o.yLow)}} מ׳. צריך לעבור מתחת.`;
+      ? `ב־{x = ${fmt(e.x)}} הקשת בגובה {y = ${fmt(e.y)}}, אבל ${name.the} בגובה {${fmt(o.yHigh)}} מ׳. צריך שהקשת תהיה גבוהה יותר שם.`
+      : `ב־{x = ${fmt(e.x)}} הקשת בגובה {y = ${fmt(e.y)}}, ו${name.the} ${name.fem ? 'מתחילה' : 'מתחיל'} בגובה {${fmt(o.yLow)}} מ׳. צריך לעבור מתחת.`;
   } else if (e.kind === 'ceiling' && o?.kind === 'ceiling') {
-    text = `הקשת עלתה לגובה {${fmt(e.y)}} ליד {x = ${fmt(e.x)}}, והדגלונים בגובה {${fmt(o.y)}}. נסו קדקוד נמוך יותר.`;
+    text = arc.a >= 0
+      ? `${upward} היא נתקעה בדגלונים. ${raise}`
+      : `הקדקוד בגובה {k = ${fmt(arc.k)}}, והדגלונים בגובה {${fmt(o.y)}}: צריך קדקוד נמוך יותר.`;
   } else if (e.kind === 'space') {
-    text = `{a = ${fmt(arc.a)}}: כש־{a ≥ 0} הפרבולה פתוחה כלפי מעלה והבלון לא חוזר לקרקע! הקדקוד צריך להיות מעל המשגר.`;
+    text = `${upward || 'הבלון עף מעל המגרש!'} ${arc.a >= 0 ? raise : ''}`;
   } else if (e.kind === 'ground' || e.kind === 'water' || e.kind === 'outOfField') {
     const land = landingX(arc);
     text = `הבלון נחת ב־{x = ${fmt(land ?? e.x)}}: נקודת האפס השנייה של {${formatVertexForm(arc)}}.`;
   } else if (e.kind === 'target') {
-    text = `פגעתם ב${obstacleName(e.id, level)}.`;
+    text = `פגעתם ${name.at}`;
+    text += r.rings.length < goalRings(level).length ? ', אבל לא בכל המטרות.' : '.';
   }
   if (level.drift) text += ` הרפסודה זזה {${fmt(level.drift)}} מ׳, אז הקדקוד עבר מ־{x = ${fmt(shot.aimed.p)}} ל־{x = ${fmt(arc.p)}}.`;
   const goal = level.goal.kind === 'soak' ? level.goal.ids : [];
   for (const id of goal) {
     const ring = level.field.obstacles.find((q) => q.id === id);
     if (ring?.kind === 'ring' && !r.rings.includes(id) && ring.x <= e.x + 1e-9) {
-      text += ` ב־{x = ${ring.x}} הקשת עברה בגובה {${fmt(yAt(arc, ring.x))}} — ${obstacleName(id, level)} ב־{${ring.y}}.`;
+      text += ` ב־{x = ${ring.x}} הקשת עברה בגובה {${fmt(yAt(arc, ring.x))}}, ו${obstacleName(id, level).the} בגובה {${ring.y}}.`;
     }
   }
   return text;
@@ -234,7 +250,7 @@ function explainMiss(level: Level, r: ShotResult): string {
 
 function explainWin(level: Level): string {
   const s = game.state;
-  if (level.goal.kind === 'catch') return 'קראתם את נקודות האפס מתוך המשוואה ותפסתם את כל הבלונים. כשיודעים איפה הזורק עומד, נקודת האפס השנייה סימטרית לו סביב הציר.';
+  if (level.goal.kind === 'catch') return 'קראתם את נקודות האפס מתוך המשוואה ותפסתם את כל הבלונים. הזורק עומד בנקודת אפס אחת, והשנייה סימטרית לה סביב ציר הסימטרייה.';
   const arc = s.shot!.flown;
   const z = zeros(arc).map((x) => fmt(x));
   const base = `{${formatVertexForm(arc)}}: קדקוד {(${fmt(arc.p)}, ${fmt(arc.k)})}, ציר סימטרייה {x = ${fmt(arc.p)}}${z.length ? `, נקודות אפס {${z.join(', ')}}` : ''}.`;
@@ -246,8 +262,10 @@ function explainWin(level: Level): string {
     }
   }
   switch (level.id) {
-    case 1: return `${base} ב־{x = 2} הגובה {${fmt(yAt(arc, 2))}} מעל החומה ({3}), והנחיתה ב־{2p = 8}.`;
-    case 2: return `${base} הפיניאטה הייתה הקדקוד, והנחיתה סימטרית ל־{0}: {x = 10}.`;
+    case 1: return `${base} ב־{x = 2} הגובה {${fmt(yAt(arc, 2))}} מעל החומה ({3}), והנחיתה ב־{2p = ${fmt(2 * arc.p)}}.`;
+    case 2: return arc.p === 5 && arc.k === 7
+      ? `${base} הפיניאטה הייתה הקדקוד, והנחיתה סימטרית ל־{0}: {x = 10}.`
+      : `${base} הקדקוד היה קרוב מאוד לפיניאטה {(5, 7)}, והנחיתה ב־{x = ${fmt(2 * arc.p)}}.`;
     case 3: return `${base} מהמגדל בגובה {3}: {a = (3 − k)/p² = ${fmt(arc.a)}}. הנחיתה לא ב־{2p}!`;
     case 5: return `${base} כיוונתם לנחיתה ב־{${fmt(s.shot!.aimed.p * 2)}}, והסחיפה הזיזה את כל הקשת {2} מ׳ ימינה.`;
     case 6: return `${base} שני פנסים באותו גובה ← הציר באמצע, {x = 4}. ומהנקודה {(0, 0)}: {16a + k = 0}.`;
@@ -379,7 +397,7 @@ function onImpact(r: ShotResult, success: boolean): void {
       physics.nudge(at, 2.5, 1.2);
     }
     fx.splash(at, '#ff3d8b', 70, 0.8);
-    fx.pop(`${fmt(r.end.y)} מ׳`, at.clone().add(new THREE.Vector3(-0.6, 0.7, 0.6)), { bg: '#d6283f', size: 0.6 });
+    fx.pop(`${fmt(r.end.y)} מ׳`, at.clone().add(new THREE.Vector3(-0.6, 0.7, 0.6)), { bg: '#d6283f', size: 0.6, rtl: true });
     stage.addShake(0.5);
   } else if (r.end.kind === 'space') {
     sfx.space();
@@ -644,7 +662,7 @@ function renderGameToText(): string {
     ball: s.ball && { x: Math.round(s.ball.x * 100) / 100, y: Math.round(s.ball.y * 100) / 100 },
     lastShot: s.shot && { flownVertex: { p: s.shot.flown.p, k: s.shot.flown.k }, end: s.shot.result.end, swiped: s.shot.result.rings, hits: s.shot.hits, success: s.shot.success },
     returnFire: v && {
-      volley: s.volleyIndex + 1, of: level.volleys!.length,
+      volley: Math.min(s.volleyIndex + 1, level.volleys!.length), of: level.volleys!.length,
       card: v.form === 'factored' ? formatFactoredForm(v.a, ...(zeros(volleyArc(v)) as [number, number])) : formatVertexForm(v),
       thrower: v.x0, bucketX: s.bucketX, lastCatch: s.lastCatch,
     },

@@ -1,7 +1,7 @@
 // Fresh "night raid" volleys for replay: a target, a wall to clear and a branch to stay under.
 // Every generated level is checked by the solver before it is offered.
-import type { Level } from './levels';
-import { winningVertices } from './shot';
+import type { Level, Volley } from './levels';
+import { volleyLanding, winningVertices } from './shot';
 
 /** Small deterministic PRNG so a seed always gives the same challenge. */
 export function rng(seed: number): () => number {
@@ -57,8 +57,8 @@ export function generateChallenge(seed: number, round = 1): Level {
       goal: { kind: 'soak', ids: ['fort'] },
       help: { preview: 'stub', landing: false, axis: true, gridLabels: true },
       hint: [
-        `הנחיתה ב־{${T}} ← {p = ${p}}. בגובה של הקשת ב־{x}: {y = k·(1 − ((x − ${p})/${p})²)}.`,
-        `מעל החומה: {k > ${Hw} / ${round2(fw)} ≈ ${round2(kLow)}}. מתחת לענף: {k < ${Hb} / ${round2(fb)} ≈ ${round2(Hb / fb)}}.`,
+        `הנחיתה ב־{${T}} ← {p = ${p}}. הגובה של הקשת ב־{x}: {y = k·x(${T} − x) / ${p * p}}.`,
+        `מעל החומה: {k·${frac(xw * (T - xw), p * p)} > ${Hw}} ← {k > ${round2(kLow)}}. מתחת לענף: {k·${frac(xb * (T - xb), p * p)} < ${Hb}} ← {k < ${round2(Hb / fb)}}.`,
       ],
       theme: round % 2 ? 'sunset' : 'night',
       modules: ['vertex-form', 'factored-form', 'quadratic-positive-negative-intervals'],
@@ -70,6 +70,40 @@ export function generateChallenge(seed: number, round = 1): Level {
   throw new Error(`no challenge found for seed ${seed}`);
 }
 
+/** An exact fraction like "32/81" for the factor x(T − x)/p² (all inputs are multiples of 0.5). */
+function frac(num: number, den: number): string {
+  let n = Math.round(num * 4);
+  let d = Math.round(den * 4);
+  const g = (a: number, b: number): number => (b ? g(b, a % b) : a);
+  const k = g(n, d);
+  n /= k;
+  d /= k;
+  return d === 1 ? String(n) : `${n}/${d}`;
+}
+
 function round2(n: number): string {
   return String(Math.round(n * 100) / 100);
+}
+
+/**
+ * After a missed catch the rival throws a new balloon of the same kind with new numbers,
+ * so the landing revealed by the miss can't simply be copied.
+ */
+export function freshVolley(prev: Volley, seed: number): Volley {
+  const r = rng(seed * 104729 + 7);
+  const prevLand = volleyLanding(prev);
+  for (let attempt = 0; attempt < 500; attempt++) {
+    const x0 = pick(r, [-1, 0, 1, 2]);
+    const w = pick(r, [3, 3.5, 4, 4.5, 5, 5.5]);
+    const a = pick(r, [-0.25, -0.5, -1]);
+    const land = x0 + 2 * w;
+    const k = -a * w * w;
+    if (land < 5 || land > 13 || Math.abs(land - prevLand) < 1.5 || k < 3 || k > 9.5) continue;
+    const p = x0 + w;
+    const hint = prev.form === 'factored'
+      ? ['מכפלה מתאפסת כשאחד הגורמים מתאפס: מאפסים כל גורם.', `הגורמים מתאפסים ב־{x = ${x0}} וב־{x = ${land}}. הזורק ב־{${x0}}, אז הדלי ב־{${land}}.`]
+      : [`נקודות האפס סימטריות סביב ציר הסימטרייה {x = ${p}}.`, `הזורק ב־{${x0}}, כלומר {${w}} מ׳ משמאל לציר. הנחיתה {${w}} מ׳ מימין: {x = ${land}}.`];
+    return { a, p, k, x0, form: prev.form, hint };
+  }
+  return prev;
 }

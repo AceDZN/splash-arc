@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Game } from '../src/game/game';
+import { LEVELS } from '../src/game/levels';
+import { volleyLanding } from '../src/game/shot';
 
 const run = (g: Game, seconds: number, dt = 1 / 60) => { for (let t = 0; t < seconds; t += dt) g.advance(dt); };
 
@@ -74,13 +76,13 @@ test('pause freezes the flight', () => {
 
 test('the raft drifts before the throw and the flight follows the shifted arc', () => {
   const g = new Game(4);
-  g.setVertex(4, 5);
+  g.setVertex(4.5, 5);
   g.fire();
   assert.equal(g.state.phase, 'drift');
   run(g, 1.2);
   assert.equal(g.state.phase, 'flight');
   assert.ok(Math.abs(g.state.raftX - 2) < 1e-9);
-  assert.equal(g.state.shot!.flown.p, 6);
+  assert.equal(g.state.shot!.flown.p, 6.5);
   run(g, 5);
   assert.equal(g.state.phase, 'won');
 });
@@ -96,11 +98,31 @@ test('return fire: a wrong bucket gets you soaked and retries the same volley; t
   run(g, 1.5);
   assert.equal(g.state.phase, 'card');
   assert.equal(g.state.volleyIndex, 0);
-  for (const x of [8, 10, 11]) {
-    g.setBucket(x);
+  // The missed volley was replaced by a fresh throw of the same kind with a different landing.
+  const v0 = g.state.level.volleys![0];
+  assert.equal(v0.form, 'vertex');
+  assert.notEqual(volleyLanding(v0), 8);
+  while (g.state.phase === 'card') {
+    g.setBucket(volleyLanding(g.state.level.volleys![g.state.volleyIndex]));
     g.fire();
-    run(g, 6);
+    run(g, 7);
   }
   assert.equal(g.state.phase, 'won');
   assert.equal(g.state.stars[3], 2, 'one soaking costs a star');
+  assert.equal(LEVELS[3].volleys![0].p, 4, 'the authored level is untouched');
+});
+
+test('restarting does not erase misses or hints: stars and unaided reflect the whole level', () => {
+  const g = new Game(0);
+  g.fire();
+  run(g, 3);
+  g.restart();
+  g.setVertex(4, 5);
+  g.fire();
+  run(g, 5);
+  assert.equal(g.state.phase, 'won');
+  assert.equal(g.state.stars[0], 2);
+  const last = g.state.log[g.state.log.length - 1];
+  assert.equal(last.attempt, 2);
+  assert.equal(last.unaided, false);
 });

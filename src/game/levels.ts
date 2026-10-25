@@ -54,7 +54,7 @@ export const LEVELS: Level[] = [
   {
     id: 1,
     name: 'מעל החומה',
-    mission: 'הקפיצו את הבלון מעל חומת הקרטון ופגעו בארגז ב־{x = 8}. הרשת תלויה מגובה {6} מ׳.',
+    mission: 'העיפו את הבלון מעל חומת הקרטון ופגעו בארגז ב־{x = 8}. הרשת תלויה מגובה {6} מ׳.',
     launcher: { x: 0, h: 0 },
     start: { p: 4, k: 2 },
     pRange: [1, 7],
@@ -80,7 +80,7 @@ export const LEVELS: Level[] = [
   {
     id: 2,
     name: 'פיניאטה',
-    mission: 'פוצצו את הפיניאטה שתלויה ב־{(5, 7)} ונחתו בבריכה ב־{x = 10}, באותה זריקה.',
+    mission: 'פוצצו את הפיניאטה שתלויה ב־{(5, 7)} והנחיתו את הבלון בבריכה ב־{x = 10}, באותה זריקה.',
     launcher: { x: 0, h: 0 },
     start: { p: 3, k: 4 },
     pRange: [1, 8],
@@ -96,8 +96,8 @@ export const LEVELS: Level[] = [
     goal: { kind: 'soak', ids: ['pinata', 'pool'] },
     help: { preview: 'stub', landing: true, axis: true, gridLabels: true },
     hint: [
-      'הפיניאטה היא הנקודה הכי גבוהה בקשת. איך קוראים לנקודה הזאת בפרבולה?',
-      'קדקוד {(5, 7)}: ציר הסימטרייה {x = 5}, ולכן הנחיתה סימטרית ל־{0}: {x = 10}.',
+      'הקשת יוצאת מ־{0} ונוחתת ב־{10}: אלה נקודות האפס. איפה ציר הסימטרייה?',
+      'הציר באמצע: {x = (0 + 10) / 2 = 5}. הוא עובר בפיניאטה, אז היא הקדקוד: {(5, 7)}.',
     ],
     theme: 'day',
     modules: ['parabola-symmetry-and-vertex', 'vertex-form'],
@@ -122,7 +122,7 @@ export const LEVELS: Level[] = [
     help: { preview: 'stub', landing: false, axis: true, gridLabels: true },
     hint: [
       'המשגר בגובה {3}, אז הנחיתה כבר לא ב־{2p}. כאן {a = (3 − k) / p²}.',
-      'נסו קדקוד {(2, 4)}: {a = (3 − 4) / 4 = −0.25}. פתרו {−0.25(x − 2)² + 4 = 0} ← {(x − 2)² = 16} ← {x = 6}.',
+      'נסו קדקוד {(2, 4)}: {a = (3 − 4) / 4 = −0.25}. פתרו {−0.25(x − 2)² + 4 = 0} ← {(x − 2)² = 16} ← {x − 2 = ±4} ← {x = 6} (הפתרון {x = −2} מאחורי המגדל).',
     ],
     theme: 'day',
     modules: ['vertex-form', 'stretch-reflect-parabola'],
@@ -130,7 +130,7 @@ export const LEVELS: Level[] = [
   {
     id: 4,
     name: 'אש חוזרת',
-    mission: 'הצריף היריב זורק בחזרה! קראו את המשוואה, מצאו איפה הבלון נוחת ושימו שם את הדלי.',
+    mission: 'הצריף היריב זורק בחזרה! קראו את המשוואה, מצאו איפה הבלון נוחת ושימו שם את הדלי. כל פספוס מביא זריקה חדשה.',
     launcher: { x: 0, h: 0 },
     start: { p: 4, k: 5 },
     pRange: [1, 7],
@@ -145,7 +145,11 @@ export const LEVELS: Level[] = [
       },
       {
         a: -0.5, p: 6, k: 8, x0: 2, form: 'factored',
-        hint: ['במכפלה, כל סוגריים שמתאפסים נותנים נקודת אפס.', '{x − 2 = 0} או {x − 10 = 0}. הזורק עומד ב־{2}, אז הדלי ב־{10}.'],
+        hint: ['מכפלה מתאפסת כשאחד הגורמים מתאפס: מאפסים כל גורם.', '{x − 2 = 0} או {x − 10 = 0}. הזורק עומד ב־{2}, אז הדלי ב־{10}.'],
+      },
+      {
+        a: -0.5, p: 3, k: 8, x0: -1, form: 'factored',
+        hint: ['שימו לב לסימן: {(x + 1)} מתאפס כש־{x = −1}, לא {1}.', '{x + 1 = 0} ← {x = −1} (שם הזורק), {x − 7 = 0} ← {x = 7}. הדלי ב־{7}.'],
       },
       {
         a: -0.25, p: 5, k: 9, x0: -1, form: 'vertex',
@@ -162,9 +166,9 @@ export const LEVELS: Level[] = [
   {
     id: 5,
     name: 'רפסודה נסחפת',
-    mission: 'הרפסודה נסחפת {2} מ׳ ימינה בין הלחיצה לזריקה. פגעו בדגל ב־{x = 10} ועברו מעל המצוף בגובה {2.5} מ׳ ב־{x = 4}.',
+    mission: 'הרפסודה נסחפת {2} מ׳ ימינה בין הלחיצה לזריקה. פגעו בדגל ב־{x = 11} ועברו מעל המצוף בגובה {2.5} מ׳ ב־{x = 4}.',
     launcher: { x: 0, h: 0 },
-    start: { p: 4, k: 3 },
+    start: { p: 5.5, k: 4 },
     pRange: [1, 7],
     kRange: [0.5, 8],
     balloons: 4,
@@ -174,14 +178,14 @@ export const LEVELS: Level[] = [
       water: [[-3, 7]],
       obstacles: [
         { kind: 'post', id: 'buoy', x: 4, yLow: 0, yHigh: 2.5, look: 'barrier' },
-        { kind: 'target', id: 'flag', x1: 9.6, x2: 10.4, y1: 0, y2: 0.9, look: 'fort' },
+        { kind: 'target', id: 'flag', x1: 10.6, x2: 11.4, y1: 0, y2: 0.9, look: 'fort' },
       ],
     },
     goal: { kind: 'soak', ids: ['flag'] },
     help: { preview: 'stub', landing: true, axis: true, gridLabels: true },
     hint: [
       'הסחיפה מזיזה את כל הקשת {2} מ׳ ימינה: {(x − p)} הופך ל־{(x − (p + 2))}. גם נקודות האפס זזות ב־{2}.',
-      'כדי לנחות ב־{10} אחרי הסחיפה, כוונו עכשיו לנחיתה ב־{8}: {p = 4}.',
+      'כדי לנחות ב־{11} אחרי הסחיפה, כוונו עכשיו לנחיתה ב־{9}: {p = 4.5}.',
     ],
     theme: 'sunset',
     modules: ['horizontal-shifts', 'vertex-form'],
@@ -189,24 +193,24 @@ export const LEVELS: Level[] = [
   {
     id: 6,
     name: 'פנסים כפולים',
-    mission: 'הדליקו את שני הפנסים, ב־{(2, 6)} וב־{(6, 6)}, בקשת אחת.',
+    mission: 'הדליקו את שני הפנסים, ב־{(3, 7.5)} וב־{(5, 7.5)}, בקשת אחת.',
     launcher: { x: 0, h: 0 },
     start: { p: 3, k: 5 },
     pRange: [1, 8],
-    kRange: [0.5, 9],
+    kRange: [0.5, 10],
     balloons: 4,
     field: {
       ...FIELD,
       obstacles: [
-        { kind: 'ring', id: 'lantern-a', x: 2, y: 6, r: 0.35, look: 'lantern' },
-        { kind: 'ring', id: 'lantern-b', x: 6, y: 6, r: 0.35, look: 'lantern' },
+        { kind: 'ring', id: 'lantern-a', x: 3, y: 7.5, r: 0.2, look: 'lantern' },
+        { kind: 'ring', id: 'lantern-b', x: 5, y: 7.5, r: 0.2, look: 'lantern' },
       ],
     },
     goal: { kind: 'soak', ids: ['lantern-a', 'lantern-b'] },
     help: { preview: 'stub', landing: false, axis: true, gridLabels: true },
     hint: [
-      'שתי נקודות באותו גובה סימטריות סביב הציר: {x = (2 + 6) / 2 = 4}.',
-      'הקשת עוברת ב־{(0, 0)} וב־{(2, 6)}: {16a + k = 0} וגם {4a + k = 6}, אז {a = −0.5} ו־{k = 8}.',
+      'שתי נקודות באותו גובה סימטריות סביב הציר: {x = (3 + 5) / 2 = 4}.',
+      'הקשת עוברת ב־{(0, 0)} וב־{(3, 7.5)}: {16a + k = 0} וגם {a + k = 7.5}, אז {a = −0.5} ו־{k = 8}.',
     ],
     theme: 'sunset',
     modules: ['parabola-symmetry-and-vertex', 'vertex-form', 'factored-form'],
@@ -225,7 +229,7 @@ export const LEVELS: Level[] = [
       obstacles: [
         { kind: 'post', id: 'branch', x: 3, yLow: 11, yHigh: Infinity, look: 'branch' },
         { kind: 'post', id: 'wall', x: 8, yLow: 0, yHigh: 6, look: 'wall' },
-        { kind: 'target', id: 'fort', x1: 9.6, x2: 10.4, y1: 0, y2: 1.4, look: 'fort' },
+        { kind: 'target', id: 'fort', x1: 9.6, x2: 10.4, y1: 0, y2: 0.8, look: 'fort' },
       ],
     },
     goal: { kind: 'soak', ids: ['fort'] },

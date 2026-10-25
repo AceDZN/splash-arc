@@ -51,7 +51,8 @@ export function shiftArc(arc: Arc, dx: number): Arc {
 /** Round for display: at most `digits` decimals, no trailing zeros. */
 export function fmt(n: number, digits = 2): string {
   const f = Math.pow(10, digits);
-  let r = Math.round(n * f) / f;
+  // School rounding: halves round away from zero (−0.125 → −0.13).
+  let r = (Math.sign(n) * Math.round(Math.abs(n) * f)) / f;
   if (Object.is(r, -0)) r = 0;
   const s = r.toFixed(digits).replace(/\.?0+$/, '');
   return s.replace('-', '−');

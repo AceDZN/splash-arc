@@ -172,7 +172,7 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
   // ---- Obstacles and targets.
   // Walls and nets turn about the vertical line x = X, so they cross the shot plane exactly there
   // while showing their face to the side camera.
-  const TURN = 0.9;
+  const TURN = 0.5;
   const turned = (x: number, y: number, z: number) => new THREE.Vector3(x + Math.sin(TURN) * z, y, Math.cos(TURN) * z);
 
   const addCardboardWall = (x: number, H: number, id: string) => {
@@ -180,23 +180,25 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
     const rows = Math.max(1, Math.round(H / 1.2));
     const rowH = H / rows;
     for (let r = 0; r < rows; r++) {
-      for (const zc of [-1.5, -0.5, 0.5, 1.5]) {
-        const panel = box(0.12, rowH - 0.01, 0.98, (r + Math.round(zc + 2)) % 2 ? '#d1a56c' : CARDBOARD);
+      // Most of the wall sits behind the shot plane so little of it overlaps the flight path.
+      for (const zc of [-1.6, -0.75, 0.1]) {
+        const panel = box(0.12, rowH - 0.01, 0.84, (r + Math.round(zc * 2 + 4)) % 2 ? '#d1a56c' : CARDBOARD);
         panel.position.copy(turned(x, rowH * r + rowH / 2, zc));
         panel.rotation.y = TURN;
         root.add(panel);
-        physics.addBox(panel, new THREE.Vector3(0.06, (rowH - 0.01) / 2, 0.49), 0.25);
+        physics.addBox(panel, new THREE.Vector3(0.06, (rowH - 0.01) / 2, 0.42), 0.25);
       }
     }
     // Tape strip on top makes the exact top edge easy to read.
-    const tape = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.06, 4), new THREE.MeshBasicMaterial({ color: '#ffffff' }));
-    tape.position.set(x, H - 0.03, 0);
+    const tape = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.06, 2.55), new THREE.MeshBasicMaterial({ color: '#ffffff' }));
+    tape.position.copy(turned(x, H - 0.03, -0.75));
     tape.rotation.y = TURN;
     g.add(tape);
     const sign = makeLabel(`חומה ${H} מ׳`, { size: 0.5, bg: '#fff6e0', border: '#6b4a2e', rtl: true, depthTest: false });
     sign.position.set(x - 0.7, H * 0.55, 1.2);
     g.add(sign);
-    const arr = arrow(new THREE.Vector3(x - 0.25, 0.05, 0.25), new THREE.Vector3(x - 0.25, H, 0.25), '#ffd23d');
+    // The height arrow stands on the exact line x = X in the shot plane.
+    const arr = arrow(new THREE.Vector3(x, 0.05, 0.6), new THREE.Vector3(x, H, 0.6), '#ffd23d');
     g.add(arr);
     g.name = id;
     root.add(g);
@@ -205,7 +207,7 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
   const addNet = (x: number, y: number) => {
     const g = new THREE.Group();
     const poleMat = toon('#ffd23d');
-    for (const z of [-2.6, 2.6]) {
+    for (const z of [-2.4, 0.4]) {
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, y + 2.8, 8), poleMat);
       pole.position.copy(turned(x, (y + 2.8) / 2, z));
       pole.castShadow = true;
@@ -223,15 +225,15 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
     cg.fillRect(0, 0, 256, 10);
     cg.fillRect(0, 118, 256, 10);
     const tex = new THREE.CanvasTexture(c);
-    const net = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.5), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.1 }));
+    const net = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 2.5), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.1 }));
     net.rotation.y = Math.PI / 2 + TURN;
-    net.position.set(x, y + 1.25, 0);
+    net.position.copy(turned(x, y + 1.25, -1));
     net.name = 'net-mesh';
     g.add(net);
     const sign = makeLabel(`רשת מגובה ${y} מ׳`, { size: 0.45, bg: '#fff6e0', border: '#6b4a2e', rtl: true, depthTest: false });
     sign.position.set(x + 1.7, y + 0.2, 0.6);
     g.add(sign);
-    const arr = arrow(new THREE.Vector3(x + 0.3, 0.05, 0.3), new THREE.Vector3(x + 0.3, y, 0.3), '#ffd23d');
+    const arr = arrow(new THREE.Vector3(x, 0.05, 0.6), new THREE.Vector3(x, y, 0.6), '#ffd23d');
     g.add(arr);
     root.add(g);
   };
@@ -370,22 +372,23 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
     const body = new THREE.Group();
     if (o.look === 'pinata') {
       const cols = ['#ff3d8b', '#ffd23d', '#3dd6ff', '#7ee07e', '#ff8a3d'];
-      const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.32, 0), toon('#ffd23d'));
+      // Sized to the swipe radius so a balloon that looks like it hits, hits.
+      const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 0), toon('#ffd23d'));
       body.add(core);
       for (let i = 0; i < 5; i++) {
-        const spike = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.45, 8), toon(cols[i]));
+        const spike = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.2, 8), toon(cols[i]));
         const a = (i / 5) * Math.PI * 2;
-        spike.position.set(Math.cos(a) * 0.38, Math.sin(a) * 0.38, 0);
+        spike.position.set(Math.cos(a) * 0.25, Math.sin(a) * 0.25, 0);
         spike.rotation.z = a - Math.PI / 2;
         body.add(spike);
       }
     } else {
-      const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.42, 12), new THREE.MeshToonMaterial({ color: '#ff9a3d', emissive: '#552200', gradientMap: undefined }));
-      const capT = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.22, 0.1, 12), toon('#7a3b1c'));
-      capT.position.y = 0.26;
+      const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.24, 12), new THREE.MeshToonMaterial({ color: '#ff9a3d', emissive: '#552200', gradientMap: undefined }));
+      const capT = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.12, 0.06, 12), toon('#7a3b1c'));
+      capT.position.y = 0.15;
       const capB = capT.clone();
       capB.rotation.z = Math.PI;
-      capB.position.y = -0.26;
+      capB.position.y = -0.15;
       body.add(lamp, capT, capB);
       body.userData.lamp = lamp;
     }
@@ -393,8 +396,8 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
     body.traverse((n) => ((n as THREE.Mesh).castShadow = true));
     g.add(body);
     g.userData.body = body;
-    // A dashed ring shows the swipe window.
-    const halo = new THREE.Mesh(new THREE.TorusGeometry(o.r + 0.12, 0.025, 6, 32), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.7 }));
+    // The ring is drawn at exactly the hit radius (true distance from the centre).
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(o.r, 0.018, 6, 40), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.7 }));
     halo.position.set(o.x, o.y, 0.05);
     g.add(halo);
     const tag = makeLabel(`(${o.x}, ${o.y})`, { size: 0.36, bg: 'rgba(40,44,60,0.8)', fg: '#ffffff' });

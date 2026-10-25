@@ -2,7 +2,7 @@
 import { type Arc, horizontalSpeed, yAt } from '../math/arc';
 import type { ShotResult } from '../math/trace';
 import { LEVELS, type Level } from './levels';
-import { generateChallenge } from './generator';
+import { freshVolley, generateChallenge } from './generator';
 import { aimArc, catches, clampVertex, FINE_SNAP, resolveShot, SNAP, volleyArc, volleyLanding, type ShotOutcome } from './shot';
 
 export type Phase = 'aim' | 'drift' | 'flight' | 'impact' | 'card' | 'incoming' | 'won' | 'out';
@@ -74,12 +74,20 @@ export class Game {
     this.state = this.fresh(levelIndex, stars, []);
   }
 
+  /** Attempts on the current level across restarts, so a restart can't erase misses or hints. */
+  private record = { key: '', shots: 0, hints: 0, misses: 0, catchTries: 0 };
+  private volleySeed = 1;
+
   /** Current challenge round (0 while playing the authored levels). */
   challengeRound = 0;
   challengeSeed = 1;
 
   private fresh(levelIndex: number, stars: number[], log: LearningEvent[], custom?: Level): GameState {
-    const level = custom ?? LEVELS[levelIndex];
+    const base = custom ?? LEVELS[levelIndex];
+    // Own copy of the volleys: a missed catch swaps in a fresh throw.
+    const level: Level = { ...base, volleys: base.volleys?.map((v) => ({ ...v })) };
+    const key = `${base.id}:${this.challengeRound}:${this.challengeSeed}`;
+    if (this.record?.key !== key) this.record = { key, shots: 0, hints: 0, misses: 0, catchTries: 0 };
     return {
       levelIndex,
       level,
@@ -111,6 +119,7 @@ export class Game {
   loadLevel(index: number): void {
     const i = Math.max(0, Math.min(LEVELS.length - 1, index));
     this.challengeRound = 0;
+    this.record.key = '';
     this.state = this.fresh(i, this.state.stars, this.state.log);
     this.events.push({ type: 'level', id: this.state.level.id });
   }
@@ -119,6 +128,7 @@ export class Game {
   loadChallenge(round: number, seed = this.challengeSeed): void {
     this.challengeRound = round;
     this.challengeSeed = seed;
+    this.record.key = '';
     this.state = this.fresh(LEVELS.length, this.state.stars, this.state.log, generateChallenge(seed + round, round));
     this.events.push({ type: 'level', id: this.state.level.id });
   }
@@ -128,7 +138,10 @@ export class Game {
       const level = this.state.level;
       this.state = this.fresh(LEVELS.length, this.state.stars, this.state.log, level);
       this.events.push({ type: 'level', id: level.id });
-    } else this.loadLevel(this.state.levelIndex);
+    } else {
+      this.state = this.fresh(this.state.levelIndex, this.state.stars, this.state.log);
+      this.events.push({ type: 'level', id: this.state.level.id });
+    }
   }
 
   /** The arc as currently aimed (before any drift). */
@@ -170,6 +183,7 @@ export class Game {
     const s = this.state;
     const list = s.level.goal.kind === 'catch' ? s.level.volleys![s.volleyIndex].hint : s.level.hint;
     if (s.hintsShown >= list.length) return list.length ? list[list.length - 1] : null;
+    this.record.hints++;
     return list[s.hintsShown++];
   }
 
@@ -181,6 +195,7 @@ export class Game {
     s.shot = resolveShot(s.level, s.p, s.k);
     s.balloonsLeft--;
     s.shotsFired++;
+    this.record.shots++;
     s.swiped = [];
     s.phaseTime = 0;
     s.raftX = 0;
@@ -275,15 +290,15 @@ export class Game {
     s.phase = 'impact';
     s.phaseTime = 0;
     s.ball = null;
-    const first = s.shotsFired === 1;
+    const first = this.record.shots === 1;
     s.log.push({
       level: s.level.id,
-      attempt: s.shotsFired,
+      attempt: this.record.shots,
       action: 'shot',
       values: { a: shot.aimed.a, p: s.p, k: s.k, flownP: shot.flown.p, endX: shot.result.end.x },
       outcome: shot.result.end.kind + (shot.result.end.id ? `:${shot.result.end.id}` : ''),
       hintsUsed: s.hintsShown,
-      unaided: first && s.hintsShown === 0,
+      unaided: first && this.record.hints === 0,
       success: shot.success,
     });
     this.events.push({ type: 'impact', result: shot.result, success: shot.success });
@@ -295,18 +310,22 @@ export class Game {
     const ok = catches(v, s.bucketX);
     s.volleyTries++;
     s.lastCatch = ok;
-    if (!ok) s.misses++;
+    this.record.catchTries++;
+    if (!ok) {
+      s.misses++;
+      this.record.misses++;
+    }
     s.phase = 'impact';
     s.phaseTime = 0;
     s.ball = null;
     s.log.push({
       level: s.level.id,
-      attempt: s.volleyTries,
+      attempt: this.record.catchTries,
       action: 'catch',
       values: { volley: s.volleyIndex, bucketX: s.bucketX, landing: s.incomingEnd },
       outcome: ok ? 'caught' : 'soakedUs',
       hintsUsed: s.hintsShown,
-      unaided: s.volleyTries === 1 && s.hintsShown === 0,
+      unaided: s.volleyTries === 1 && this.record.misses === 0 && this.record.hints === 0,
       success: ok,
     });
     this.events.push(ok ? { type: 'caught', x: s.bucketX } : { type: 'soakedUs', x: s.incomingEnd });
@@ -320,6 +339,10 @@ export class Game {
         s.volleyTries = 0;
         s.hintsShown = 0;
         if (s.volleyIndex >= s.level.volleys!.length) return this.win();
+      } else {
+        // New numbers, same kind of card: the landing shown by the miss can't be copied.
+        s.level.volleys![s.volleyIndex] = freshVolley(s.level.volleys![s.volleyIndex], this.volleySeed++);
+        s.hintsShown = 0;
       }
       s.phase = 'card';
       s.incoming = null;
@@ -338,7 +361,9 @@ export class Game {
   private win(): void {
     const s = this.state;
     s.phase = 'won';
-    const fails = s.level.goal.kind === 'catch' ? s.misses : s.shotsFired - 1;
+    const fails = s.level.goal.kind === 'catch' ? this.record.misses : this.record.shots - 1;
+    // A replay after a win starts a fresh record.
+    this.record.key = '';
     const stars = fails === 0 ? 3 : fails === 1 ? 2 : 1;
     if (this.challengeRound === 0) s.stars[s.levelIndex] = Math.max(s.stars[s.levelIndex] ?? 0, stars);
     this.events.push({ type: 'won', stars });

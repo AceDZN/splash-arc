@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { LEVELS } from '../src/game/levels';
 import { resolveShot, winningVertices, catches, volleyLanding, volleyArc } from '../src/game/shot';
 import { yAt } from '../src/math/arc';
+import { ringDistance, type Ring } from '../src/math/trace';
 
 const L = (id: number) => LEVELS.find((l) => l.id === id)!;
 const set = (vs: { p: number; k: number }[]) => vs.map((v) => `${v.p},${v.k}`).sort();
@@ -57,12 +58,12 @@ test('level 3: a vertex below the raised launcher (a ≥ 0) flies off to space',
   assert.equal(resolveShot(L(3), 2, 2).result.end.kind, 'space');
 });
 
-test('level 4: rival zeros are 8, 10 and 11, and only the zero catches', () => {
+test('level 4: rival zeros are 8, 10, 7 and 11, and only the zero catches', () => {
   const vs = L(4).volleys!;
-  assert.deepEqual(vs.map(volleyLanding), [8, 10, 11]);
-  assert.ok(Math.abs(volleyArc(vs[0]).h) < 1e-12, 'launched from a zero');
-  assert.ok(Math.abs(volleyArc(vs[1]).h) < 1e-12);
-  assert.ok(Math.abs(volleyArc(vs[2]).h) < 1e-12);
+  assert.deepEqual(vs.map(volleyLanding), [8, 10, 7, 11]);
+  for (const v of vs) assert.ok(Math.abs(volleyArc(v).h) < 1e-12, 'launched from a zero');
+  // y = −0.5(x + 1)(x − 7): the (x + 1) factor vanishes at x = −1, where the thrower stands.
+  for (const x of [-1, 2, 3, 6]) assert.ok(Math.abs(yAt(volleyArc(vs[2]), x) - -0.5 * (x + 1) * (x - 7)) < 1e-12);
   // The factored card y = −0.5(x − 2)(x − 10) is the same curve as −0.5(x − 6)² + 8.
   for (const x of [2, 4, 6, 9]) assert.ok(Math.abs(yAt(volleyArc(vs[1]), x) - -0.5 * (x - 2) * (x - 10)) < 1e-12);
   for (const v of vs) {
@@ -75,15 +76,17 @@ test('level 4: rival zeros are 8, 10 and 11, and only the zero catches', () => {
   }
 });
 
-test('level 5: the drift shifts the whole arc by +2, so only p = 4 hits the flag at 10', () => {
+test('level 5: the drift shifts the whole arc by +2, so only p = 4.5 hits the flag at 11', () => {
   const wins = winningVertices(L(5));
   assert.ok(wins.length > 0);
-  assert.ok(wins.every((v) => v.p === 4));
-  const naive = resolveShot(L(5), 5, 5);
-  assert.equal(naive.flown.p, 7);
-  assert.ok(naive.result.end.x > 11, 'aiming the landing at 10 before the drift lands at 12');
-  const good = resolveShot(L(5), 4, 5);
-  assert.equal(good.flown.p, 6);
+  assert.ok(wins.every((v) => v.p === 4.5));
+  // The level starts on the trap: the pre-drift landing marker sits on the flag.
+  assert.equal(L(5).start.p * 2, 11);
+  const naive = resolveShot(L(5), 5.5, 5);
+  assert.equal(naive.flown.p, 7.5);
+  assert.ok(Math.abs(naive.result.end.x - 13) < 1e-9, 'aiming the landing at 11 before the drift lands at 13');
+  const good = resolveShot(L(5), 4.5, 5);
+  assert.equal(good.flown.p, 6.5);
   assert.equal(good.flown.x0, 2);
   assert.equal(good.success, true);
 });
@@ -93,6 +96,12 @@ test('level 6: two lanterns at the same height force p = 4, and through (0, 0): 
   const s = resolveShot(L(6), 4, 8);
   assert.equal(s.aimed.a, -0.5);
   assert.deepEqual(s.hits, ['lantern-a', 'lantern-b']);
+  // Neighbouring arcs pass clearly outside the lantern's hit radius (true distance), so a miss looks like a miss.
+  const lantern = L(6).field.obstacles.find((o) => o.id === 'lantern-a') as Ring;
+  for (const [p, k] of [[4, 7.5], [4, 8.5], [3.5, 8], [4.5, 8]]) {
+    const arc = resolveShot(L(6), p, k).flown;
+    assert.ok(ringDistance(arc, lantern, 0, 16) > lantern.r + 0.05, `(${p}, ${k}) passes ${ringDistance(arc, lantern, 0, 16).toFixed(2)} m away`);
+  }
 });
 
 test('level 7 (transfer): only vertex (5, k) with 9.5 ≤ k ≤ 13 works', () => {
@@ -111,12 +120,12 @@ test('level 7 (transfer): only vertex (5, k) with 9.5 ≤ k ≤ 13 works', () =>
   assert.ok(allFine.every((v) => Math.abs(v.p - 5) <= 0.4 + 1e-9));
 });
 
-test('eyeballing is not enough: one fixed vertex never wins more than one level, and winning sets are tiny', () => {
+test('eyeballing is not enough: one fixed vertex never wins two levels, and winning sets are tiny', () => {
   const shootLevels = LEVELS.filter((l) => l.goal.kind === 'soak');
   for (let p = 1; p <= 8; p += 0.5) {
     for (let k = 0.5; k <= 13; k += 0.5) {
       const won = shootLevels.filter((l) => p >= l.pRange[0] && p <= l.pRange[1] && k >= l.kRange[0] && k <= l.kRange[1] && resolveShot(l, p, k).success);
-      assert.ok(won.length <= 2, `(${p}, ${k}) wins ${won.map((l) => l.id)}`);
+      assert.ok(won.length <= 1, `(${p}, ${k}) wins ${won.map((l) => l.id)}`);
     }
   }
   for (const l of shootLevels) {

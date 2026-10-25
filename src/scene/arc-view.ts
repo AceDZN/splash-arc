@@ -113,7 +113,7 @@ export class ArcView {
       this.landText = landTxt;
       if (this.landLabel) { this.group.remove(this.landLabel); disposeObject(this.landLabel); this.landLabel = null; }
       if (landTxt) {
-        this.landLabel = makeLabel(landTxt, { size: 0.38, bg: MAGENTA, fg: '#ffffff', rtl: false });
+        this.landLabel = makeLabel(landTxt, { size: 0.38, bg: MAGENTA, fg: '#ffffff', rtl: true });
         this.group.add(this.landLabel);
       }
     }

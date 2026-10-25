@@ -133,7 +133,7 @@ function yTopFor(level: Level): number {
     if (o.kind === 'ring') top = Math.max(top, o.y + 1);
   }
   for (const v of level.volleys ?? []) top = Math.max(top, v.k + 1);
-  return Math.min(15, Math.ceil(top + 0.5));
+  return Math.min(15, Math.ceil(top + 0.3));
 }
 
 function buildCurrentLevel(): void {

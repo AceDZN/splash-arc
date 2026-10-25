@@ -84,7 +84,7 @@ export const LEVELS: Level[] = [
     launcher: { x: 0, h: 0 },
     start: { p: 3, k: 4 },
     pRange: [1, 8],
-    kRange: [0.5, 12],
+    kRange: [0.5, 9],
     balloons: 4,
     field: {
       ...FIELD,
@@ -109,7 +109,7 @@ export const LEVELS: Level[] = [
     launcher: { x: 0, h: 3 },
     start: { p: 3, k: 4 },
     pRange: [0.5, 7],
-    kRange: [0.5, 10],
+    kRange: [0.5, 7],
     balloons: 4,
     field: {
       ...FIELD,
@@ -166,7 +166,7 @@ export const LEVELS: Level[] = [
     launcher: { x: 0, h: 0 },
     start: { p: 4, k: 3 },
     pRange: [1, 7],
-    kRange: [0.5, 10],
+    kRange: [0.5, 8],
     balloons: 4,
     drift: 2,
     field: {
@@ -193,7 +193,7 @@ export const LEVELS: Level[] = [
     launcher: { x: 0, h: 0 },
     start: { p: 3, k: 5 },
     pRange: [1, 8],
-    kRange: [0.5, 12],
+    kRange: [0.5, 9],
     balloons: 4,
     field: {
       ...FIELD,
@@ -218,7 +218,7 @@ export const LEVELS: Level[] = [
     launcher: { x: 0, h: 0 },
     start: { p: 4, k: 6 },
     pRange: [1, 8],
-    kRange: [0.5, 15],
+    kRange: [0.5, 14],
     balloons: 3,
     field: {
       ...FIELD,

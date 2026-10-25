@@ -41,7 +41,7 @@ function noiseTexture(base: string, spots: string[], size = 256, count = 1400): 
 const THEMES: Record<Theme, { top: string; bottom: string; sun: string; sunI: number; hemiSky: string; hemiGround: string; hemiI: number; fog: string; sea: string }> = {
   day: { top: '#3fa9f5', bottom: '#cdeffd', sun: '#fff3d6', sunI: 2.6, hemiSky: '#bfe6ff', hemiGround: '#f2d7a0', hemiI: 1.35, fog: '#cdeffd', sea: '#21a7bf' },
   sunset: { top: '#5b6cc9', bottom: '#ffb36b', sun: '#ffc48a', sunI: 2.2, hemiSky: '#ffc9a0', hemiGround: '#d9a46a', hemiI: 1.15, fog: '#ffb990', sea: '#3a7fb0' },
-  night: { top: '#1d1640', bottom: '#d4567a', sun: '#ff9a6b', sunI: 1.15, hemiSky: '#7a6ad0', hemiGround: '#6a4a3a', hemiI: 0.95, fog: '#5a3a6a', sea: '#2d3f7a' },
+  night: { top: '#2a1f5c', bottom: '#f07a8c', sun: '#ffb08a', sunI: 1.6, hemiSky: '#a99af0', hemiGround: '#8a6a5a', hemiI: 1.45, fog: '#5a3a6a', sea: '#2d3f7a' },
 };
 
 export class Stage {

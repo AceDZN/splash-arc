@@ -326,7 +326,8 @@ function handle(ev: GameEvent): void {
     case 'soakedUs': {
       sfx.splash(true);
       sfx.laugh();
-      hero.play('soaked');
+      const close = Math.abs(ev.x - s.bucketX) <= 1.2;
+      hero.play(close ? 'soaked' : 'frustrated');
       rivals[0].play('laugh');
       const at = new THREE.Vector3(ev.x, 0.2, 0);
       fx.splash(at, '#3dd6ff', 110, 1);
@@ -335,7 +336,7 @@ function handle(ev: GameEvent): void {
       arcView.setRivalTrail(volleyPath());
       const v = level.volleys![s.volleyIndex];
       const eq = v.form === 'factored' ? formatFactoredForm(v.a, ...(zeros(volleyArc(v)) as [number, number])) : formatVertexForm(v);
-      hud.toast(`נרטבתם! {${eq}} נוחת ב־{x = ${fmt(ev.x)}}, והדלי היה ב־{x = ${fmt(s.bucketX)}}.`, 4.5, 'bad');
+      hud.toast(`${close ? 'נרטבתם!' : 'פספוס! החול שלנו נרטב.'} {${eq}} נוחת ב־{x = ${fmt(ev.x)}}, והדלי היה ב־{x = ${fmt(s.bucketX)}}. עכשיו זריקה חדשה.`, 4.5, 'bad');
       break;
     }
     case 'won':

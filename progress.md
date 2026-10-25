@@ -12,9 +12,12 @@ Original prompt: build the web-based 3D educational game Splash Arc (קשת המ
 - Tests: 26 passing (`npm test`): arc math, every authored level's exact winning set, the advertised consequences, eyeballing/constant-strategy checks, generator, state machine (snapping, misses, stars, out-of-balloons, hints, pause, drift, return fire).
 - Browser checks in the built-in browser at 1280×720, 375×812 and 812×375; console clean. The machine was extremely loaded by other crews' browsers (load average 150–220, ~1.5 fps in the pane), so flights were checked with `advanceTime` and any FPS measured here is not representative.
 
+- Tripo helper finished: camper and rival rigged (Humanoid + Mixamo) with six clips each, bundled per GLB; all five models meshopt-compressed with WebP textures (0.3–1.2 MB). Clips wired to events: throw on launch, cheer on a win or catch, hit (soaked) when splashed, frustrated on our miss, laugh for the rival, jump for "flew to space". 220 Tripo credits (6 generations, 2 rigs); details in ASSETS.md.
+- Independent math review (docs/MATH_REVIEW.md) found 3 blockers and 10 should-fixes; all blockers and should-fixes are fixed except that walls/nets are improved rather than perfect (see the resolution table). Level changes: L4 gets a fourth `(x + 1)(x − 7)` card and fresh volleys after a miss; L5 target moved to 11 and starts on the drift trap; L6 lanterns moved to (3, 7.5)/(5, 7.5) with true-distance hits; L7 fort box lowered.
+- Counselor onboarding line on level 1 and return fire; challenge raids with exact-fraction hints; captures redone; PLAYTEST.md written. 27 tests pass. Headless Chrome measured 60 fps at 1280×720 DPR 2 (M2 Max, load ≈ 12).
+
 ## Open items / next
 
-- Push to GitHub once the user approves creating the public repo.
-- Tripo character clips: integrate throw/soaked/dodge once the helper's rig export lands (idle and cheer are in the current GLB; procedural accents cover the rest).
-- Math reviewer findings → fixes (see docs/MATH_REVIEW.md).
-- Visual review captures vs mockups (docs/VISUAL_REVIEW.md).
+- Push to GitHub once the user approves creating the public repo `AceDZN/splash-arc` (blocked in this session by the permission classifier).
+- Real students on real phones: fun and learning are unverified.
+- Optional: lazy-load Rapier to cut the first download; a teacher view of the learning log; a dedicated stretch (`a`) control.

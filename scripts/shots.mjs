@@ -51,6 +51,7 @@ const log = {};
 // 01 — first 30 seconds: drag the vertex of level 1 up to (4, 5).
 await open(1);
 log.first30 = (await dragVertex({ p: 4, k: 5 })).aim;
+await page.waitForTimeout(700); // let CSS transitions (toasts, bubbles) settle; the simulation is paused in manual mode
 await page.screenshot({ path: `${out}/01-first-30s.png` });
 
 // 03 — consequence: the default arc on level 1 splats on the wall (y(2) = 1.5).
@@ -58,6 +59,7 @@ await open(1);
 await page.keyboard.press('Space');
 await step(1100);
 log.consequence = (await state()).lastShot;
+await page.waitForTimeout(700); // let CSS transitions (toasts, bubbles) settle; the simulation is paused in manual mode
 await page.screenshot({ path: `${out}/03-consequence-wall.png` });
 
 // 03b — return fire: the rival's arc lands on us when the bucket sits under the vertex.
@@ -66,6 +68,7 @@ await page.keyboard.press('ArrowLeft');
 await page.keyboard.press('Space');
 await step(3500);
 log.returnFire = (await state()).returnFire;
+await page.waitForTimeout(700); // let CSS transitions (toasts, bubbles) settle; the simulation is paused in manual mode
 await page.screenshot({ path: `${out}/03b-return-fire.png` });
 
 // 02 — impact: level 6, vertex (4, 8) lights both lanterns and soaks the fort area.
@@ -74,11 +77,13 @@ log.impactAim = (await dragVertex({ p: 4, k: 8 })).aim;
 await page.keyboard.press('Space');
 await step(2900);
 log.impact = (await state()).lastShot;
+await page.waitForTimeout(700); // let CSS transitions (toasts, bubbles) settle; the simulation is paused in manual mode
 await page.screenshot({ path: `${out}/02-impact.png` });
 
 // 04 — night raid: level 7 aimed at (5, 11).
 await open(7);
 log.night = (await dragVertex({ p: 5, k: 11 })).aim;
+await page.waitForTimeout(700); // let CSS transitions (toasts, bubbles) settle; the simulation is paused in manual mode
 await page.screenshot({ path: `${out}/04-night-raid.png` });
 
 writeFileSync(`${out}/capture-log.json`, JSON.stringify({ base, viewport: [W, H], log, errors }, null, 2));

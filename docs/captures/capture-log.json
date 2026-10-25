@@ -36,7 +36,7 @@
     },
     "returnFire": {
       "volley": 1,
-      "of": 3,
+      "of": 4,
       "card": "y = −0.5(x − 4)² + 8",
       "thrower": 0,
       "bucketX": 4.5,
@@ -85,12 +85,5 @@
       "preview": "none"
     }
   },
-  "errors": [
-    "Failed to load resource: the server responded with a status of 404 (Not Found)",
-    "Failed to load resource: the server responded with a status of 404 (Not Found)",
-    "Failed to load resource: the server responded with a status of 404 (Not Found)",
-    "Failed to load resource: the server responded with a status of 404 (Not Found)",
-    "Failed to load resource: the server responded with a status of 404 (Not Found)",
-    "Failed to load resource: the server responded with a status of 404 (Not Found)"
-  ]
+  "errors": []
 }

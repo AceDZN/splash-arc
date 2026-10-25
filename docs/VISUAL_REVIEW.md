@@ -1,13 +1,13 @@
 # Visual review — mockups vs real gameplay
 
-Targets: ChatGPT gpt-image mockups in [`visual-targets/`](visual-targets/) (prompts in `PROMPTS.md`). They are design targets, not evidence. Actual: real gameplay captured by [`scripts/shots.mjs`](../scripts/shots.mjs) at the mockups' 1672×941 framing, in Chrome (headless, Playwright), with **real inputs**: mouse drags on the canvas to move the vertex handle and key presses (Space, arrows) to fire and move the bucket. The script only reads `render_game_to_text()` and projects a world point to find where the handle is on screen; it never injects a result. Captures are in [`captures/`](captures/) with the state log in `capture-log.json`.
+Targets: ChatGPT gpt-image mockups in [`visual-targets/`](visual-targets/) (prompts in `PROMPTS.md`). They are design targets, not evidence. Actual: real gameplay captured by [`scripts/shots.mjs`](../scripts/shots.mjs) at the mockups' 1672×941 framing, in Chrome (headless, Playwright), with **real inputs**: mouse drags on the canvas to move the vertex handle and key presses (Space, arrows) to fire and move the bucket. The script only reads `render_game_to_text()` and projects a world point to find where the handle is on screen; it never injects a result. Captures are in [`captures/`](captures/) with the state log in `capture-log.json`. Recaptured on 26 Oct after the math-review fixes.
 
 | Target | Actual | State at capture |
 |---|---|---|
 | ![](visual-targets/01-first-30s.png) | ![](captures/01-first-30s.png) | Level 1 after dragging the vertex from (4, 2) to (4, 5): `y = −0.31(x − 4)² + 5`, zeros 0 and 8 |
-| ![](visual-targets/02-impact.png) | ![](captures/02-impact.png) | Level 6, vertex (4, 8): both lanterns swiped, splash at x = 8, fort blocks flying |
+| ![](visual-targets/02-impact.png) | ![](captures/02-impact.png) | Level 6, vertex (4, 8): both lanterns at (3, 7.5) and (5, 7.5) lit, splash at x = 8, fort blocks flying, counter 2/2 |
 | ![](visual-targets/03-consequence.png) | ![](captures/03-consequence-wall.png) | Level 1 default arc splats on the wall at `y(2) = 1.5` |
-| (same target, return-fire half) | ![](captures/03b-return-fire.png) | Level 4, bucket at 4.5 while `y = −0.5(x − 4)² + 8` lands at 8: our camper is soaked |
+| (same target, return-fire half) | ![](captures/03b-return-fire.png) | Level 4, bucket at 4.5 while `y = −0.5(x − 4)² + 8` lands at 8: a miss with the real landing shown; a fresh volley follows |
 | ![](visual-targets/04-night-raid.png) | ![](captures/04-night-raid.png) | Level 7 aimed at (5, 11), no preview, no grid numbers |
 
 ## What matches
@@ -31,3 +31,10 @@ Targets: ChatGPT gpt-image mockups in [`visual-targets/`](visual-targets/) (prom
 ## Other sizes checked
 
 In the built-in browser: 1280×720, phone portrait 375×812 (HUD stacks, field smaller, a "rotate for a bigger field" tip on the title screen) and phone landscape 812×375 (compact HUD). Console clean (no errors) once all Tripo models are present.
+
+## Changes made because of this comparison
+
+- Moved the fire button to the bottom-right and split the nudge bar into k (yellow) and p (teal) groups, as in the mockups.
+- The soaked counter now counts up during the shot (mockup 2 shows 2/3 mid-impact).
+- Turned walls and nets about their exact x-line so they read as solid panels from the side camera (first pass), then narrowed them after the math review found they looked wider than the rule.
+- Enlarged the campers and moved them toward the camera; added Tripo clips (throw, cheer, hit, jump, frustrated, laugh).

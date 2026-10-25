@@ -58,7 +58,7 @@ export const LEVELS: Level[] = [
     launcher: { x: 0, h: 0 },
     start: { p: 4, k: 2 },
     pRange: [1, 7],
-    kRange: [0.5, 10],
+    kRange: [0.5, 8],
     balloons: 5,
     field: {
       ...FIELD,

@@ -62,7 +62,7 @@ export interface GameState {
 }
 
 const DRIFT_TIME = 1.1;
-const IMPACT_TIME = 1.6;
+const IMPACT_TIME = 1.3;
 const SLOWMO = 0.75;
 
 export class Game {

@@ -58,7 +58,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
 .toast.bad::before { content: '💦 '; }
 .toast.good { border: 3px solid #1fb36b; }
 .toast.good::before { content: '✔ '; }
-.bubble { position: absolute; left: 16px; bottom: 120px; max-width: min(420px, 80vw); padding: 10px 14px; border-radius: 16px 16px 16px 4px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.2); opacity: 0; transform: translateY(8px); transition: 0.2s; font-size: 16px; line-height: 1.55; }
+.bubble { position: absolute; left: 16px; top: 84px; max-width: min(380px, 80vw); padding: 10px 14px; border-radius: 4px 16px 16px 16px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.2); opacity: 0; transform: translateY(8px); transition: 0.2s; font-size: 16px; line-height: 1.55; }
 .bubble.show { opacity: 1; transform: none; }
 .bubble-who { font-weight: 800; color: var(--teal); font-size: 13px; }
 
@@ -129,7 +129,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
   .hint-btn { padding: 10px 12px; font-size: 15px; }
   .toast { font-size: 15px; top: 38%; }
   .logo-he { font-size: 44px; }
-  .bubble { bottom: 110px; font-size: 14px; }
+  .bubble { font-size: 14px; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .mission { display: none; }
@@ -171,7 +171,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3f0; fon
   .eq { font-size: 22px; }
   .chip { font-size: 11px; padding: 2px 6px; }
   .toast { top: 46%; font-size: 14px; }
-  .bubble { bottom: 150px; left: 12px; right: 12px; max-width: none; }
+  .bubble { top: 33%; left: 12px; right: 12px; max-width: none; }
 }
 
 .rotate-tip { display: none; font-size: 14px; font-weight: 600; color: #4b3f9e; background: #eeeaff; border-radius: 12px; padding: 6px 10px; }

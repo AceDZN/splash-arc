@@ -153,8 +153,13 @@ function buildCurrentLevel(): void {
   stage.setTheme(level.theme);
   stage.setView({ x0: -2.8, x1: 14.4, y0: -0.6, y1: yTop + 0.4 }, !started);
   placeCast();
-  hud.say(null);
   hud.selectParam('k');
+  // A first-time nudge from the counselor; it disappears with the first throw.
+  const intro: Record<number, string> = {
+    1: 'גררו את הנקודה הזוהרת — זה הקדקוד. שימו לב איך {k} והמשוואה משתנים, ואיפה הבלון ינחת. ואז: שגר!',
+    4: 'עכשיו הם זורקים עלינו! קראו את המשוואה, גררו את הדלי לנקודה שבה הבלון ינחת ולחצו מוכן!',
+  };
+  hud.say(game.challengeRound === 0 ? intro[level.id] ?? null : null);
 }
 
 function placeCast(): void {
@@ -257,12 +262,14 @@ function handle(ev: GameEvent): void {
   const level = s.level;
   switch (ev.type) {
     case 'launch':
+      hud.say(null);
       sfx.whoosh();
       hero.play('throw');
       arcView.setTrail(null);
       arcView.setBallColor(false);
       break;
     case 'incoming':
+      hud.say(null);
       sfx.whoosh();
       rivals[0].play('throw');
       arcView.setRivalTrail(null);

@@ -28,7 +28,7 @@ test('level 1: p = 4 and 4 < k < 6 — exactly k ∈ {4.5, 5, 5.5} on the 0.5 gr
 test('level 1 wrong approaches give the advertised consequence', () => {
   assert.equal(resolveShot(L(1), 4, 2).result.end.id, 'wall', 'the default arc splats on the wall');
   assert.equal(resolveShot(L(1), 4, 4).result.end.id, 'wall', 'k = 4 only touches the top: y(2) = 3');
-  assert.equal(resolveShot(L(1), 4, 6).result.end.id, 'net', 'k = 6 reaches the net');
+  assert.equal(resolveShot(L(1), 4, 6).result.end.id, 'canopy', 'k = 6 reaches the tree canopy');
   // Bigger k with the same p does not land farther.
   assert.equal(resolveShot(L(1), 4, 4.5).flown.p, resolveShot(L(1), 4, 5.5).flown.p);
   // Treating the vertex as the landing point (p = 8) overshoots.

@@ -54,7 +54,7 @@ export const LEVELS: Level[] = [
   {
     id: 1,
     name: 'מעל החומה',
-    mission: 'העיפו את הבלון מעל חומת הקרטון ופגעו בארגז ב־{x = 8}. הרשת תלויה מגובה {6} מ׳.',
+    mission: 'העיפו את הבלון מעל חומת הקרטון ופגעו בארגז ב־{x = 8}, ועברו מתחת לצמרת העץ שמתחילה בגובה {6} מ׳.',
     launcher: { x: 0, h: 0 },
     start: { p: 4, k: 2 },
     pRange: [1, 7],
@@ -64,7 +64,7 @@ export const LEVELS: Level[] = [
       ...FIELD,
       obstacles: [
         { kind: 'post', id: 'wall', x: 2, yLow: 0, yHigh: 3, look: 'wall' },
-        { kind: 'post', id: 'net', x: 4, yLow: 6, yHigh: Infinity, look: 'net' },
+        { kind: 'ceiling', id: 'canopy', x1: 3, x2: 5, y: 6, look: 'canopy' },
         { kind: 'target', id: 'crate', x1: 7.6, x2: 8.4, y1: 0, y2: 0.8, look: 'crate' },
       ],
     },
@@ -72,7 +72,7 @@ export const LEVELS: Level[] = [
     help: { preview: 'toVertex', landing: true, axis: true, gridLabels: true },
     hint: [
       'הבלון נוחת בנקודת האפס השנייה. היא סימטרית ל־{0} סביב הציר, אז כדי לנחות ב־{8} צריך {p = 4}.',
-      'הגובה מעל החומה: {y(2) = a·2·(2 − 8)}, ועם {a = −k/16} יוצא {y(2) = 0.75k}. צריך {0.75k > 3}, כלומר {k > 4}, וגם {k < 6} בגלל הרשת.',
+      'הגובה מעל החומה: {y(2) = a·2·(2 − 8)}, ועם {a = −k/16} יוצא {y(2) = 0.75k}. צריך {0.75k > 3}, כלומר {k > 4}, וגם {k < 6} כדי לעבור מתחת לצמרת.',
     ],
     theme: 'day',
     modules: ['parabola-y-equals-x2', 'parabola-symmetry-and-vertex', 'vertical-shifts'],

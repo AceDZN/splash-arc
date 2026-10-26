@@ -282,6 +282,35 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
     root.add(g);
   };
 
+  // A big eucalyptus whose leafy crown starts at exactly y and fills the sky above it: clearly something to pass under.
+  const addCanopy = (x1: number, x2: number, y: number) => {
+    const g = new THREE.Group();
+    const cx = (x1 + x2) / 2;
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, y + 1, 9), toon('#c9b8a3'));
+    trunk.position.set(cx + 0.3, (y + 1) / 2, -3.4);
+    trunk.castShadow = true;
+    g.add(trunk);
+    const leafMats = [toon('#6b9a5c'), toon('#7fae6a'), toon('#5f8f52')];
+    // Flat underside at exactly y, spanning x1..x2 across the shot plane.
+    const under = new THREE.Mesh(new THREE.BoxGeometry(x2 - x1, 1.6, 3.6), toon('#4f7f45'));
+    under.position.set(cx, y + 0.8, -0.6);
+    under.castShadow = true;
+    g.add(under);
+    for (let i = 0; i < 16; i++) {
+      const r = 0.8 + (i % 3) * 0.3;
+      const leaf = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 0), leafMats[i % 3]);
+      leaf.position.set(x1 + 0.2 + ((i * 0.61) % (x2 - x1 - 0.4)), y + 1.6 + (i % 4) * 0.6, -2.2 + (i % 5) * 0.7);
+      leaf.castShadow = true;
+      g.add(leaf);
+    }
+    const sign = makeLabel(`צמרת מגובה ${y} מ׳`, { size: 0.45, bg: '#fff6e0', border: '#6b4a2e', rtl: true, depthTest: false });
+    sign.position.set(x2 + 1.4, y - 0.1, 0.6);
+    g.add(sign);
+    const arr = arrow(new THREE.Vector3(cx, 0.05, 0.6), new THREE.Vector3(cx, y, 0.6), '#ffd23d');
+    g.add(arr);
+    root.add(g);
+  };
+
   const addBunting = (x1: number, x2: number, y: number) => {
     const g = new THREE.Group();
     const ropeY = y + 0.2;
@@ -413,7 +442,10 @@ export function buildLevel(level: Level, physics: Physics, yTop: number): LevelV
       else if (o.look === 'net') addNet(o.x, o.yLow);
       else if (o.look === 'branch') addBranch(o.x, o.yLow);
       else if (o.look === 'barrier') addBuoy(o.x, o.yHigh);
-    } else if (o.kind === 'ceiling') addBunting(o.x1, o.x2, o.y);
+    } else if (o.kind === 'ceiling') {
+      if (o.look === 'canopy') addCanopy(o.x1, o.x2, o.y);
+      else addBunting(o.x1, o.x2, o.y);
+    }
     else if (o.kind === 'target') addTarget(o);
     else if (o.kind === 'ring') addRing(o);
   }

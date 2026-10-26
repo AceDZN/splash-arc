@@ -198,7 +198,7 @@ function obstacleName(id: string | undefined, level: Level): { the: string; at: 
   const n = (the: string, at: string, fem = false) => ({ the, at, fem });
   if (!o) return n('המטרה', 'במטרה', true);
   if (o.kind === 'post') return { wall: n('החומה', 'בחומה', true), net: n('הרשת', 'ברשת', true), branch: n('הענף', 'בענף'), barrier: n('המצוף', 'במצוף') }[o.look];
-  if (o.kind === 'ceiling') return n('הדגלונים', 'בדגלונים');
+  if (o.kind === 'ceiling') return o.look === 'canopy' ? n('צמרת העץ', 'בצמרת העץ', true) : n('הדגלונים', 'בדגלונים');
   if (o.kind === 'ring') return o.look === 'pinata' ? n('הפיניאטה', 'בפיניאטה', true) : n('הפנס', 'בפנס');
   return { crate: n('הארגז', 'בארגז'), pool: n('הבריכה', 'בבריכה', true), ring: n('גלגל ההצלה', 'בגלגל ההצלה'), fort: n('המבצר', 'במבצר') }[o.look];
 }
@@ -226,8 +226,8 @@ function explainMiss(level: Level, r: ShotResult): string {
       : `ב־{x = ${fmt(e.x)}} הקשת בגובה {y = ${fmt(e.y)}}, ו${name.the} ${name.fem ? 'מתחילה' : 'מתחיל'} בגובה {${fmt(o.yLow)}} מ׳. צריך לעבור מתחת.`;
   } else if (e.kind === 'ceiling' && o?.kind === 'ceiling') {
     text = arc.a >= 0
-      ? `${upward} הקשת נתקעה בדגלונים. ${raise}`
-      : `הקדקוד בגובה {k = ${fmt(arc.k)}}, והדגלונים בגובה {${fmt(o.y)}}: צריך קדקוד נמוך יותר.`;
+      ? `${upward} הקשת נתקעה ${name.at}. ${raise}`
+      : `הקדקוד בגובה {k = ${fmt(arc.k)}}, ו${name.the} ${o.look === 'canopy' ? 'מתחילה' : ''} בגובה {${fmt(o.y)}}: צריך קדקוד נמוך יותר, כדי לעבור מתחת.`.replace('  ', ' ');
   } else if (e.kind === 'space') {
     text = `${upward || 'הבלון עף מעל המגרש!'} ${arc.a >= 0 ? raise : ''}`;
   } else if (e.kind === 'ground' || e.kind === 'water' || e.kind === 'outOfField') {
@@ -391,7 +391,7 @@ function onImpact(r: ShotResult, success: boolean): void {
   hero.play(r.end.kind === 'space' ? 'dodge' : 'frustrated');
   sfx.laugh();
   if (r.end.kind === 'post' || r.end.kind === 'ceiling') {
-    const isNet = o?.kind === 'post' && (o.look === 'net' || o.look === 'branch');
+    const isNet = (o?.kind === 'post' && (o.look === 'net' || o.look === 'branch')) || (o?.kind === 'ceiling' && o.look === 'canopy');
     if (isNet) sfx.boing(); else sfx.splat();
     if (o?.kind === 'post' && (o.look === 'wall' || o.look === 'barrier')) {
       fx.wallSplat(at, '#ff3d8b');

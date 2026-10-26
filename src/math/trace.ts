@@ -32,14 +32,14 @@ export interface Ring {
   look: 'pinata' | 'lantern';
 }
 
-/** A horizontal span the balloon must stay under (bunting between poles): blocks y ≥ y for x1 ≤ x ≤ x2. */
+/** A span the balloon must stay under (bunting, a tree canopy): blocks every height ≥ y for x1 ≤ x ≤ x2. */
 export interface Ceiling {
   kind: 'ceiling';
   id: string;
   x1: number;
   x2: number;
   y: number;
-  look: 'bunting';
+  look: 'bunting' | 'canopy';
 }
 
 export type Obstacle = Post | Target | Ring | Ceiling;

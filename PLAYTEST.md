@@ -29,4 +29,4 @@ What was verified, how, and what wasn't. Automation proves the rules and flows w
 - Walls and nets are 3D panels turned about their exact x-line; they still look somewhat wider than the rule they represent.
 - Mobile portrait shows a small field; the title screen suggests rotating.
 - The bundle is large for a phone on a slow connection (Rapier WASM is inlined).
-- Not deployed; the public GitHub repo could not be created from this session (see progress.md).
+- Not deployed to Vercel yet; the code is public at https://github.com/AceDZN/splash-arc.

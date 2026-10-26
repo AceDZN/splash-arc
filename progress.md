@@ -18,6 +18,6 @@ Original prompt: build the web-based 3D educational game Splash Arc (קשת המ
 
 ## Open items / next
 
-- Push to GitHub once the user approves creating the public repo `AceDZN/splash-arc` (blocked in this session by the permission classifier).
+- Pushed: the user approved on 26 Oct 2026, and the repo is public at https://github.com/AceDZN/splash-arc (main).
 - Real students on real phones: fun and learning are unverified.
 - Optional: lazy-load Rapier to cut the first download; a teacher view of the learning log; a dedicated stretch (`a`) control.

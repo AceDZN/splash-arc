@@ -24,7 +24,7 @@ A side-on 3/4 view of the shot plane: the camera sits to the side of the field, 
 
 A sunny Israeli summer camp on the Mediterranean: pale sand, eucalyptus trees, a red-and-white lifeguard tower, colorful wooden cabins, a striped beach umbrella, the sea behind. Toon shading with soft rim light, saturated but warm palette (sand #f2d7a0, sea #2bb3c0, camp orange #ff8a3d, balloon magenta #ff3d8b / cyan #3dd6ff, cardboard #c89b62). Level 7 is the night raid: a sunset turning to dusk, string lights on the counselors' fort, lanterns, flashlights.
 
-Procedural and exact (never generated meshes): the arc, the vertex handle, the axis of symmetry line, the zero markers, the metre grid and height poles, walls with their exact heights, the net, branches, lanterns, buckets and fort blocks (physics bodies).
+Procedural and exact (never generated meshes): the arc, the vertex handle, the axis of symmetry line, the zero markers, the metre grid and height poles, walls with their exact heights, the tree canopy, branches, lanterns, buckets and fort blocks (physics bodies).
 
 Tripo models: the two camper crews (our crew in orange camp shirts, the rival cabin in teal; rigged, throw / dodge / cheer / soaked), the wooden slingshot launcher, the lifeguard tower and a camp cabin as set pieces.
 
@@ -39,7 +39,7 @@ Tripo models: the two camper crews (our crew in orange camp shirts, the rival ca
 
 ## First 30 seconds
 
-Level 1 opens on the beach: the slingshot at x = 0, a cardboard wall (3 m) at x = 2, a crate at x = 8, a volleyball net at 6 m above. The vertex handle pulses. The default arc (vertex (4, 2)) clips the wall: you fire, splat, the wall wobbles, the rival kid laughs. You drag the vertex up; the equation's `k` and `a` change together and the landing marker stays at x = 8 because p didn't move. At k = 5 the balloon sails over the wall and soaks the crate. You drag too high and the net catches it.
+Level 1 opens on the beach: the slingshot at x = 0, a cardboard wall (3 m) at x = 2, a crate at x = 8, and a eucalyptus crown that starts 6 m up. The vertex handle pulses. The default arc (vertex (4, 2)) clips the wall: you fire, splat, the wall wobbles, the rival kid laughs. You drag the vertex up; the equation's `k` and `a` change together and the landing marker stays at x = 8 because p didn't move. At k = 5 the balloon sails over the wall and soaks the crate. You drag too high and the balloon gets stuck in the tree's leaves.
 
 ## What it is not
 
